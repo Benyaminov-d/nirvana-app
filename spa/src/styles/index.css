@@ -1,0 +1,167 @@
+/* Pull design tokens into the main CSS bundle (must be first) */
+@import "../assets/tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face { font-family: 'TrajanPro'; src: url('../assets/fonts/trajan-pro/TrajanPro-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'TrajanPro'; src: url('../assets/fonts/trajan-pro/TrajanPro-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
+
+:root { color-scheme: dark; }
+
+/* Fixed background layer that works on all devices including iOS */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #111;
+  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../assets/bg.JPG');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+  will-change: transform;
+}
+
+body { 
+  background-color: transparent;
+  position: relative;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* Ensure main content is above the background */
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Parity with legacy index.html styles */
+:root { --disc-h: 0px; --rib-h: 68px; }
+html, body { margin: 0; padding: 0; }
+
+/* Liquid glass */
+.glass { 
+  background: var(--colour-glass-bg);
+  border: var(--effect-glass-border-1px);
+  -webkit-backdrop-filter: var(--effect-glass-backdrop);
+  backdrop-filter: var(--effect-glass-backdrop);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  border-radius: var(--effect-glass-radius);
+}
+.trajan-text { font-family: 'TrajanPro', 'Trajan Pro', 'Times New Roman', serif; }
+.cmu-text { font-family: 'IBM Plex Sans', sans-serif; }
+.cmu-sans-text { font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif; }
+.email-text { font-family: 'TrajanPro', 'Trajan Pro', 'Times New Roman', serif; color: #C9A54A; }
+.disc-text { color: #AD8E61; }
+.glass-noborder { border: 0 !important; }
+
+/* Chat bubble with bottom-right tail */
+.chat-bubble { 
+  position: relative; 
+  display: inline-block; 
+  padding: 10px 14px; 
+  border-radius: 14px; 
+  background: var(--colour-glass-bg); 
+  border: var(--effect-glass-border-1px); 
+  -webkit-backdrop-filter: var(--effect-glass-backdrop); 
+  backdrop-filter: var(--effect-glass-backdrop); 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
+  overflow: visible; 
+}
+.chat-bubble--right { --tail-w: 16px; --tail-h: 10px; --tail-inset: 18px; }
+.chat-bubble--right::before { 
+  content: ""; rotate: 180deg; position: absolute; right: var(--tail-inset); bottom: calc(-1 * var(--tail-h) - 1px); 
+  width: var(--tail-w); height: var(--tail-h); background: var(--colour-glass-border); 
+  clip-path: polygon(50% 50%, 100% 100%, 0 100%); 
+}
+.chat-bubble--right::after { 
+  content: ""; rotate: 180deg; position: absolute; right: calc(var(--tail-inset) + 1px); bottom: calc(-1 * var(--tail-h) + 1px); 
+  width: calc(var(--tail-w) - 2px); height: calc(var(--tail-h) - 2px); background: var(--colour-glass-bg); 
+  clip-path: polygon(50% 50%, 100% 100%, 0 100%); 
+}
+
+/* Chat animations */
+.fade-in-up { opacity: 0; transform: translateY(8px); animation: chatIn 300ms ease forwards; }
+@keyframes chatIn { to { opacity: 1; transform: translateY(0); } }
+
+/* Typing dots */
+.typing { display:inline-flex; align-items:center; gap:4px; }
+.typing .dot { width:6px; height:6px; border-radius:9999px; background:#d1d5db; opacity:.4; animation: blink 1s infinite ease-in-out; }
+.typing .dot:nth-child(2){ animation-delay: .15s; }
+.typing .dot:nth-child(3){ animation-delay: .3s; }
+@keyframes blink { 0%, 80%, 100% { opacity:.2; } 40% { opacity:1; } }
+
+/* Simple spinner */
+.spinner { width: 14px; height: 14px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.35); border-top-color: rgba(255,255,255,0.9); animation: sp 0.8s linear infinite; display:inline-block; }
+@keyframes sp { to { transform: rotate(360deg);} }
+
+
+
+/* Markdown spacing for readability */
+.markdown { line-height: 1.75; color: #e5e7eb; }
+.markdown p { margin: 0 0 1rem 0; }
+.markdown h1 { font-size: 1.6rem; margin: 1.6rem 0 .8rem 0; }
+.markdown h2 { font-size: 1.35rem; margin: 1.4rem 0 .7rem 0; }
+.markdown h3 { font-size: 1.15rem; margin: 1.2rem 0 .6rem 0; }
+.markdown h4 { font-size: 1.05rem; margin: 1rem 0 .5rem 0; }
+.markdown ul, .markdown ol { padding-left: 1.25rem; margin: .75rem 0; }
+.markdown li { margin: .25rem 0; }
+.markdown strong { font-weight: 600; }
+.markdown a { color: #93c5fd; text-decoration: underline; }
+.markdown code { background: rgba(255,255,255,0.06); padding: 0 .25rem; border-radius: 4px; }
+.markdown pre { background: rgba(0,0,0,0.35); padding: .75rem 1rem; border-radius: 6px; overflow-x: auto; }
+
+/* Weather Widget Styles */
+.weather-widget {
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.weather-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.weather-widget .text-3xl {
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Symbol Tooltip Styles */
+.tooltip-fade-in {
+  animation: tooltipFadeIn 0.2s ease-out forwards;
+}
+
+.tooltip-fade-out {
+  animation: tooltipFadeOut 0.2s ease-in forwards;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tooltipFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
