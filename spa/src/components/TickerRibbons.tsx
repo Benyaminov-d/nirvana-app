@@ -218,8 +218,8 @@ export default function TickerRibbons({ size, mode = 'five_stars', country }: { 
         if (mode !== 'five_stars') {
           const all = await fetchTickerFeed(0);
           if (!cancelled) {
-            setR95(all.filter((x) => x.cvar95 != null));
-            setR99(all.filter((x) => x.cvar99 != null));
+            setR95(all.filter((x) => x.cvar95 != null && Number.isFinite(x.cvar95) && x.cvar95 >= -0.95));
+            setR99(all.filter((x) => x.cvar99 != null && Number.isFinite(x.cvar99) && x.cvar99 >= -0.95));
           }
         }
       } catch {}
@@ -228,7 +228,7 @@ export default function TickerRibbons({ size, mode = 'five_stars', country }: { 
           // Use the updated function with cache buster
           const items = await fetchTickerFeedFiveStars();
           if (!cancelled) {
-            const validItems = items.filter((x:any) => x.cvar99 != null);
+            const validItems = items.filter((x:any) => x.cvar99 != null && Number.isFinite(x.cvar99) && x.cvar99 >= -0.95);
             console.log('TickerRibbons five_stars:', { 
               total: items.length, 
               withValidCvar99: validItems.length, 
