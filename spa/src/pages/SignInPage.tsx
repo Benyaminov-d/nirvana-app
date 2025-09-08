@@ -1,13 +1,19 @@
 import { useState } from 'react';
-import { postJSON } from '../services/http';
 import AuthLayout from '../components/AuthLayout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+
+  // Get the page user was trying to access before being redirected to login
+  const from = (location.state as { from?: string })?.from || '/';
 
   async function doSignin(e?: React.FormEvent) {
     try {
@@ -23,12 +29,16 @@ export default function SignInPage() {
     setIsLoading(true);
     
     try {
-      await postJSON('/auth/signin', { email, password });
-      setStatus('Success');
-      // Redirect could be added here
-      window.location.href = '/';
+      const success = await login(email, password);
+      
+      if (success) {
+        // Redirect to home page or original destination
+        navigate(from, { replace: true });
+      } else {
+        setStatus('Invalid email or password');
+      }
     } catch (err: any) {
-      setStatus('Invalid email or password');
+      setStatus('An error occurred during login');
     } finally {
       setIsLoading(false);
     }
