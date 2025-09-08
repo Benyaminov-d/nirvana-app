@@ -1,49 +1,8 @@
 import { useState, useEffect } from 'react';
 import { fetchMarketQuote, fetchHistoricalData, fetchInstrumentSummary, type MarketQuote, type HistoricalDataPoint, type InstrumentSummary } from '../services/demo';
+import { formatPrice, formatPriceChange, formatNumber, formatNegPct, hasValue, getCurrencySymbol } from '../utils/formatters';
 
 type TimePeriod = '1D' | '5D' | '1M' | '6M' | 'YTD' | '1Y' | '5Y' | 'Max';
-
-interface EnhancedProductDisplayProps {
-  symbol: string;
-}
-
-function formatPrice(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return '';
-  return `$${value.toFixed(2)}`;
-}
-
-function formatNumber(value: number | null | undefined, suffix: string = ''): string {
-  if (value == null || Number.isNaN(value)) return '';
-  
-  if (suffix === 'M' && value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
-  }
-  if (suffix === 'B' && value >= 1000000000) {
-    return `${(value / 1000000000).toFixed(2)}B`;
-  }
-  if (suffix === 'T' && value >= 1000000000000) {
-    return `${(value / 1000000000000).toFixed(2)}T`;
-  }
-  
-  return value.toLocaleString() + suffix;
-}
-
-function hasValue(value: number | null | undefined): boolean {
-  return value != null && !Number.isNaN(value);
-}
-
-function formatChange(change: number, changePercent: number): { display: string; isPositive: boolean } {
-  const isPositive = change >= 0;
-  const sign = isPositive ? '+' : '';
-  const display = `${sign}${formatPrice(change)} (${sign}${changePercent.toFixed(2)}%)`;
-  return { display, isPositive };
-}
-
-function formatNegPct(v: number | null | undefined): string {
-  if (v == null || Number.isNaN(v)) return '—';
-  const abs = Math.abs(v);
-  return `-${abs.toFixed(1)}%`;
-}
 
 const TIME_PERIODS: { label: string; value: TimePeriod }[] = [
   { label: '1Y', value: '1Y' },
@@ -223,8 +182,14 @@ export default function EnhancedProductDisplay({ symbol }: EnhancedProductDispla
     
     setLoadingQuote(true);
     fetchMarketQuote(symbol)
-      .then(setQuote)
-      .catch(() => setQuote(null))
+      .then(quoteData => {
+        console.log('Quote data received:', quoteData);
+        setQuote(quoteData);
+      })
+      .catch(error => {
+        console.error('Error fetching quote:', error);
+        setQuote(null);
+      })
       .finally(() => setLoadingQuote(false));
   }, [symbol]);
 
@@ -257,7 +222,7 @@ export default function EnhancedProductDisplay({ symbol }: EnhancedProductDispla
 
   if (!symbol) return null;
 
-  const changeInfo = quote ? formatChange(quote.change, quote.change_percent) : null;
+  const changeInfo = quote ? formatPriceChange(quote.change, quote.change_percent, quote.currency) : null;
 
   // Prepare chart data and sort by date (oldest to newest)
   const chartData = historicalData?.map(point => ({
@@ -298,6 +263,11 @@ export default function EnhancedProductDisplay({ symbol }: EnhancedProductDispla
         <div className="flex-1">
           <div className="text-xl font-bold mb-2">
             {loadingQuote ? 'Loading...' : `${quote?.name || symbol} (${quote?.symbol || symbol})`}
+            {quote?.country && quote?.currency && (
+              <span className="ml-2 px-2 py-0.5 bg-gray-800 rounded text-xs text-gray-300">
+                {quote.country} · {quote.currency}
+              </span>
+            )}
           </div>
         </div>
         
@@ -321,7 +291,7 @@ export default function EnhancedProductDisplay({ symbol }: EnhancedProductDispla
           {/* Price range */}
           {chartData.length > 0 && (
             <div className="text-sm text-gray-400">
-              ${Math.min(...chartData.map(d => d.price)).toFixed(2)} - ${Math.max(...chartData.map(d => d.price)).toFixed(2)}
+              {getCurrencySymbol(quote?.currency)}{Math.min(...chartData.map(d => d.price)).toFixed(2)} - {getCurrencySymbol(quote?.currency)}{Math.max(...chartData.map(d => d.price)).toFixed(2)}
             </div>
           )}
         </div>
@@ -330,7 +300,7 @@ export default function EnhancedProductDisplay({ symbol }: EnhancedProductDispla
       {quote && !loadingQuote && (
           <div className="mt-4">
             <div className="text-4xl font-bold mb-2">
-              {formatPrice(displayPrice || quote.current_price)}
+              {formatPrice(displayPrice || quote.current_price, quote.currency)}
             </div>
             
             {displayDate && (
@@ -347,9 +317,9 @@ export default function EnhancedProductDisplay({ symbol }: EnhancedProductDispla
             
             {!hoverPoint && quote.after_hours_price && (
               <div className="text-sm text-gray-400 mt-1">
-                {formatPrice(quote.after_hours_price)} {quote.after_hours_change ? (
+                {formatPrice(quote.after_hours_price, quote.currency)} {quote.after_hours_change ? (
                   <span className={quote.after_hours_change >= 0 ? 'text-green-400' : 'text-red-400'}>
-                    {quote.after_hours_change >= 0 ? '+' : ''}{formatPrice(quote.after_hours_change)} 
+                    {quote.after_hours_change >= 0 ? '+' : ''}{formatPrice(quote.after_hours_change, quote.currency)} 
                     ({quote.after_hours_change_percent?.toFixed(2)}%)
                   </span>
                 ) : ''} After Hours
@@ -440,15 +410,15 @@ export default function EnhancedProductDisplay({ symbol }: EnhancedProductDispla
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-400">Open</span>
-              <span className="text-xs">{formatPrice(quote?.open_price || quote?.current_price || 0)}</span>
+              <span className="text-xs">{formatPrice(quote?.open_price || quote?.current_price || 0, quote?.currency)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Day Low</span>
-              <span className="text-xs">{formatPrice(quote?.low || quote?.current_price || 0)}</span>
+              <span className="text-xs">{formatPrice(quote?.low || quote?.current_price || 0, quote?.currency)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Day High</span>
-              <span className="text-xs">{formatPrice(quote?.high || quote?.current_price || 0)}</span>
+              <span className="text-xs">{formatPrice(quote?.high || quote?.current_price || 0, quote?.currency)}</span>
             </div>
           </div>
           

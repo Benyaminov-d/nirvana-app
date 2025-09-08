@@ -44,9 +44,11 @@ export type RecommendationItem = {
   symbol: string;
   name: string;
   type: string;
+  country?: string | null;
+  currency?: string | null;
   compass_score: number | null;
   nirvana_standard_pass: boolean;
-  annualized_return: { period: '10Y' | '5Y' | 'SI' | string; value_pct: number | null };
+  annualized_return: number | { period: '10Y' | '5Y' | 'SI' | string; value_pct: number | null };
   start_date?: string | null;
 };
 
@@ -86,6 +88,8 @@ export async function fetchAssistantThread(threadId: string): Promise<{ thread_i
 export type MarketQuote = {
   symbol: string;
   name: string;
+  currency?: string | null;    // Добавляем информацию о валюте
+  country?: string | null;     // И о стране
   current_price: number;
   change: number;
   change_percent: number;

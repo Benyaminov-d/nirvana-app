@@ -24,7 +24,7 @@ export default function RootLayout() {
         {/* place ribbons only on homepage; other pages keep space */}
       </div>
       {/* Header intentionally removed per requirement */}
-      <main className="w-full px-3 md:px-6 py-4">
+      <main className="w-full">
         <Outlet />
       </main>
       {/* No footer for app */}

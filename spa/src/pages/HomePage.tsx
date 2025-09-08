@@ -1,25 +1,78 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { demoSearch, fetchInstrumentSummary, fetchRecommendations, assistantAsk, fetchAssistantThread, type DemoSearchItem, type InstrumentSummary, type RecommendationItem, type AssistantResponse } from '../services/demo';
+import { demoSearch, fetchInstrumentSummary, fetchRecommendations, assistantAsk, fetchAssistantThread, fetchMarketQuote, fetchHistoricalData, type DemoSearchItem, type InstrumentSummary, type RecommendationItem, type AssistantResponse } from '../services/demo';
 import { useCompliance } from '../context/ComplianceContext';
 import WeatherWidget, { isWeatherResponse } from '../components/WeatherWidget';
 import SymbolTooltip from '../components/SymbolTooltip';
 import EnhancedProductDisplay from '../components/EnhancedProductDisplay';
+import ProductHeader from '../components/ProductHeader';
+import { formatNegPct } from '../utils/formatters';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 type LossLevels = InstrumentSummary['loss_levels'];
 
-function formatNegPct(v: number | null | undefined): string {
-  if (v == null || Number.isNaN(v)) return '—';
-  const abs = Math.abs(v);
-  return `-${abs.toFixed(1)}%`;
+// formatNegPct импортирован из utils/formatters
+
+// Компонент-обертка для ProductHeader
+function ProductHeaderWrapper({ symbol }: { symbol: string }) {
+  const [quote, setQuote] = useState<any>(null);
+  const [historicalData, setHistoricalData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        // Загружаем данные о котировке и историю цен
+        const quoteData = await fetchMarketQuote(symbol);
+        const historyData = await fetchHistoricalData(symbol, '1Y');
+        
+        if (quoteData && historyData?.data) {
+          setQuote(quoteData);
+          setHistoricalData(historyData.data);
+        }
+      } catch (error) {
+        console.error('Error loading product data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (symbol) {
+      loadData();
+    }
+  }, [symbol]);
+
+  if (loading || !quote) {
+    return <div className="mb-4 text-gray-400">Loading product information...</div>;
+  }
+
+  // Находим минимальную и максимальную цену из исторических данных
+  const prices = historicalData.map(d => d.price);
+  const minPrice = prices.length > 0 ? Math.min(...prices) : quote.current_price * 0.9;
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : quote.current_price * 1.1;
+
+  return (
+    <div className="mb-4">
+      <ProductHeader
+        symbol={symbol}
+        name={quote.name}
+        currentPrice={quote.current_price}
+        priceRange={{ min: minPrice, max: maxPrice }}
+        change={quote.change}
+        changePercent={quote.change_percent}
+        currency={quote.currency}
+        country={quote.country}
+      />
+    </div>
+  );
 }
 
 type ChatMessage =
   | { kind: 'text'; role: 'user' | 'assistant'; text: string }
   | { kind: 'summary_card'; id: string; symbol: string; data: InstrumentSummary | null };
 
-export default function DemoPage() {
+export default function HomePage() {
   const { state } = useCompliance();
   
   // Get user's selected country for filtering
@@ -236,14 +289,18 @@ export default function DemoPage() {
         setMatches([]);
       } else if (rp.pane === 'matches') {
         setSummary(null);
-        // normalize: server may return {results} or {items}
-        const list: any[] = Array.isArray((rp as any).results)
-          ? (rp as any).results
-          : Array.isArray((rp as any).items)
-            ? (rp as any).items
-            : [];
+        // normalize: server may return {recommendations}, {results} or {items}
+        const list: any[] = Array.isArray((rp as any).recommendations)
+          ? (rp as any).recommendations
+          : Array.isArray((rp as any).results)
+            ? (rp as any).results
+            : Array.isArray((rp as any).items)
+              ? (rp as any).items
+              : [];
         setMatches(list);
-        setAsOf(typeof rp.as_of === 'string' ? rp.as_of : null);
+        // Try to get the timestamp from metadata or as_of
+        const timestamp = (rp as any).metadata?.timestamp || rp.as_of;
+        setAsOf(typeof timestamp === 'string' ? timestamp : null);
       }
       if (res.thread_id) {
         setThreadId(res.thread_id);
@@ -258,7 +315,7 @@ export default function DemoPage() {
   const showRight = Boolean(loadingSummary || loadingRecs || summary || (matches.length > 0));
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-4">
+    <div className="w-full mx-auto px-4 py-4">
       <div className="md:flex gap-3 items-stretch min-h-[calc(100dvh-2rem)]">
         {/* Left: Chat */}
         <div className={`${showRight ? 'md:w-2/3' : 'md:w-full'} transition-all duration-300 glass !bg-black/30 nv-glass--inner-hairline border border-white/10 rounded-2xl p-4 flex flex-col h-[calc(100dvh-2rem)] md:overflow-hidden`}>
@@ -334,6 +391,8 @@ export default function DemoPage() {
           )}
           {summary && selected && !loadingSummary && (
             <div>
+              {/* Добавляем компонент ProductHeader для отображения заголовка страницы */}
+              <ProductHeaderWrapper symbol={selected.symbol} />
               <EnhancedProductDisplay symbol={selected.symbol} />
               <div className="mt-6">
                 <div className="flex items-center gap-2 text-gray-200">
@@ -374,7 +433,20 @@ export default function DemoPage() {
                 <div className="text-right justify-self-end">Search relevance ranking (Compass Score)</div>
               </div>
               <div className="flex items-center justify-between mb-2">
-                <div className="text-xs text-gray-400">{asOf ? `as of ${asOf}` : ''}</div>
+                <div className="text-xs text-gray-400">
+                  {asOf ? (() => {
+                    try {
+                      // Format timestamp nicely for display
+                      const date = new Date(asOf);
+                      if (!isNaN(date.getTime())) {
+                        return `as of ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                      }
+                      return `as of ${asOf}`;
+                    } catch {
+                      return `as of ${asOf}`;
+                    }
+                  })() : ''}
+                </div>
                 <label className="flex items-center gap-2 text-gray-200">
                   <input type="checkbox" checked={showReturns} onChange={(e)=> setShowReturns(e.target.checked)} aria-label="Show returns toggle" />
                   <span>Show returns</span>
@@ -415,7 +487,14 @@ export default function DemoPage() {
                         </td>
                         {showReturns && (
                           <td className="py-3 pr-4 text-right group-hover:bg-transparent">
-                            {r.annualized_return?.value_pct != null ? (
+                            {typeof r.annualized_return === 'number' ? (
+                              <span 
+                                className={`font-medium transition-colors duration-200 ${r.annualized_return >= 0 ? 'text-green-400 group-hover:text-green-300' : 'text-red-400 group-hover:text-red-300'}`}
+                                title="Annual Return"
+                              >
+                                {r.annualized_return >= 0 ? '+' : ''}{(r.annualized_return * 100).toFixed(2)}%
+                              </span>
+                            ) : r.annualized_return?.value_pct != null ? (
                               <span 
                                 className={`font-medium transition-colors duration-200 ${r.annualized_return.value_pct >= 0 ? 'text-green-400 group-hover:text-green-300' : 'text-red-400 group-hover:text-red-300'}`}
                                 title={`${r.annualized_return.period}`}
