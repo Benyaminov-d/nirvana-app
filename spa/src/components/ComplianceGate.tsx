@@ -28,6 +28,7 @@ export default function ComplianceGate() {
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
       <div className="relative glass nv-glass--inner-hairline border border-white/10 bg-black/60 rounded-2xl max-w-lg w-full p-6 text-white">
         <h2 className="text-xl font-semibold trajan-text mb-3 text-center">Nirvana</h2>
+        {/* <h3 className="text-xl font-semibold trajan-text mb-3 text-center">Neutral search engine for financial products - search, not advice. No pay-to-rank. No commissions. Information only; not advice or a recommendation.</h3> */}
         <p className="text-sm text-gray-300 mb-4 text-center">Please select your country or region and accept the Member EULA to proceed.</p>
 
         <label className="text-sm block mb-3">Country or Region
@@ -45,7 +46,7 @@ export default function ComplianceGate() {
 
         <label className="text-sm flex items-start gap-2 mb-4">
           <input type="checkbox" className="mt-1" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
-          <span>I have read and accept the <a href="/member-eula" className="underline text-gray-200 hover:text-white" target="_blank" rel="noopener noreferrer">Member EULA</a>.</span>
+          <span>I accept the <a href="/member-eula" className="underline text-gray-200 hover:text-white" target="_blank" rel="noopener noreferrer">Member EULA</a> and understand that search results are information only and are not advice or a recommendation.</span>
         </label>
 
         <button
