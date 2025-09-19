@@ -1,4 +1,4 @@
-FROM nirvana-website-website-dev
+FROM node:20-bullseye-slim
 
 WORKDIR /app/spa
 
