@@ -1,0 +1,4 @@
+.env
+spa/node_modules/
+spa/dist/
+spa/package-lock.json

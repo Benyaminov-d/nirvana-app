@@ -1,0 +1,88 @@
+:root {
+  /* Colour tokens */
+  --colour-bg-black: #0B0F14;
+  --colour-glass-bg: rgba(255,255,255,0.04);
+  --colour-glass-border: rgba(255,255,255,0.08);
+  --colour-glass-inner-highlight: rgba(255,255,255,0.06);
+
+  --colour-text-primary: #F5F7FB;
+  --colour-text-secondary: #AAB4C3;
+  --colour-text-muted: #7A8498;
+
+  --colour-score: #3A86FF;
+  --colour-score-emphasis: #6FA8FF;
+
+  --colour-standard-pass: #D4AF37;
+  --colour-standard-pass-grad-a: #C9A54A;
+  --colour-standard-pass-grad-b: #E6C977;
+  --colour-standard-neutral: #7A8498;
+
+  --colour-success: #22C3A6;
+  --colour-warning: #F2C14E;
+  --colour-error: #D64545;
+
+  /* Effects */
+  --effect-glass-backdrop: blur(12px) saturate(110%);
+  --effect-glass-radius: 12px;
+  --effect-glass-border-1px: 1px solid var(--colour-glass-border);
+  --effect-glass-inner-top-hairline: inset 0 1px 0 var(--colour-glass-inner-highlight);
+  --effect-score-glow: 0 0 0 1px rgba(111,168,255,0.25), 0 0 24px rgba(111,168,255,0.20);
+
+  /* Typography */
+  --font-family-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 600;
+  --font-weight-semibold: 700;
+
+  --font-size-score-lg: 24px;
+  --font-size-score-sm: 18px;
+  --font-size-title: 16px;
+  --font-size-meta: 12px;
+}
+
+/* Glass card */
+.nv-glass {
+  background: var(--colour-glass-bg);
+  border: var(--effect-glass-border-1px);
+  -webkit-backdrop-filter: var(--effect-glass-backdrop);
+  backdrop-filter: var(--effect-glass-backdrop);
+  border-radius: var(--effect-glass-radius);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+.nv-glass--inner-hairline {
+  box-shadow: var(--effect-glass-inner-top-hairline), 0 10px 30px rgba(0,0,0,0.25);
+}
+
+/* Score */
+.nv-score { color: var(--colour-score); font-weight: var(--font-weight-semibold); }
+.nv-score--lg { font-size: var(--font-size-score-lg); }
+.nv-score--sm { font-size: var(--font-size-score-sm); }
+.nv-score--glow { box-shadow: var(--effect-score-glow); }
+
+/* Standard badge */
+.nv-standard {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+.nv-standard--pass { background: var(--colour-standard-pass); color: var(--colour-text-primary); }
+.nv-standard--neutral { color: var(--colour-standard-neutral); border: 1px solid var(--colour-standard-neutral); background: transparent; }
+
+/* Text helpers */
+.nv-text-primary { color: var(--colour-text-primary); }
+.nv-text-secondary { color: var(--colour-text-secondary); }
+.nv-text-muted { color: var(--colour-text-muted); }
+
+/* Body background for dark glass theme */
+body.nv-dark {
+  color: var(--colour-text-primary);
+  background-color: var(--colour-bg-black);
+}
+
+/* Accessibility focus ring */
+.nv-focus:focus { outline: 2px solid rgba(58,134,255,0.45); outline-offset: 2px; }
+
+

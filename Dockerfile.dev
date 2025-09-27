@@ -1,0 +1,16 @@
+FROM node:20-bullseye-slim
+
+WORKDIR /app/spa
+
+# Clear website content and install fresh
+RUN rm -rf /app/spa/*
+
+# Copy app sources
+COPY spa/ /app/spa/
+
+# Clean install for app
+RUN rm -rf node_modules package-lock.json
+RUN npm install --no-audit --no-fund
+
+EXPOSE 5174
+CMD ["sh","-lc","set -e; npm config set fund false; npm config set audit false; npm config set fetch-retries 5; npm config set fetch-timeout 600000; npx vite --host 0.0.0.0 --port 5174 --base /"]
