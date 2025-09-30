@@ -363,10 +363,10 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <LossCell 
+              {/* <LossCell 
                 title="Expected loss in a down year" 
                 value={formatNegPct(summary?.loss_levels?.down_year?.cvar_pct ?? null)} 
-              />
+              /> */}
               <LossCell 
                 title="Expected loss across 1 in 20 worst years (95-CVaR)" 
                 value={formatNegPct(summary?.loss_levels?.one_in_20?.cvar95_pct ?? null)} 
