@@ -467,7 +467,7 @@ export default function HomePage() {
       
       // Always fetch the most recent matches for this chat
       console.log("Fetching latest matches for chat");
-      const allMatchesResult = await fetchChatMatches(chatId!, '');
+      const allMatchesResult = await fetchChatMatches(chatId!, '', getRegion());
       const arr = (allMatchesResult && Array.isArray(allMatchesResult.chat_matches))
         ? allMatchesResult.chat_matches
         : [];
@@ -514,7 +514,7 @@ export default function HomePage() {
     const checkMatches = async () => {
       if (!chatId) { setHasMatchesInChat(false); return; }
       try {
-        const res = await fetchChatMatches(chatId, '');
+        const res = await fetchChatMatches(chatId, '', getRegion());
         if (!cancelled) {
           const hasAny = Array.isArray(res?.chat_matches) && res.chat_matches.length > 0;
           setHasMatchesInChat(hasAny);
@@ -589,7 +589,13 @@ export default function HomePage() {
       try {
         // Generate an idempotency key per user message to suppress duplicate SSE opens
         const rid = `${ensuredChatId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
-        es = assistantStream(userInput, threadId, ensuredChatId, undefined, rid);
+        es = assistantStream(
+          userInput,
+          threadId || undefined,
+          chatId || undefined,
+          getRegion(),
+          rid
+        );
         await new Promise<void>((resolve, reject) => {
           const decodeB64Utf8 = (b64: string): string => {
             try {
@@ -665,7 +671,12 @@ export default function HomePage() {
         });
       } catch (err) {
         // Fallback: non-streaming POST
-        const response = await assistantAsk(ensuredChatId!, userInput, threadId);
+        const response = await assistantAsk(
+          ensuredChatId!,
+          userInput,
+          threadId || undefined,
+          getRegion()
+        );
         acc = response.text || '';
         if (response.thread_id) setThreadId(response.thread_id);
       } finally {
@@ -702,7 +713,7 @@ export default function HomePage() {
         if (isToolAction) {
         try {
           // Avoid duplicating the user message server-side when we already persisted it via SSE
-          const response = await assistantAsk(ensuredChatId!, `<<TOOL>> ${userInput}`, threadId);
+          const response = await assistantAsk(ensuredChatId!, `<<TOOL>> ${userInput}`, threadId || undefined, getRegion());
           acc = response.text || '';
           if (response.thread_id) setThreadId(response.thread_id);
           if (acc) {
@@ -727,7 +738,7 @@ export default function HomePage() {
               const summaryCardMsgs = mappedMessages.filter(m => m.kind === 'summary_card');
               if (summaryCardMsgs.length > 0) {
                 try {
-                  const summaryCards = await fetchChatSummaryCards(ensuredChatId!);
+                  const summaryCards = await fetchChatSummaryCards(ensuredChatId!, getRegion());
                   if (summaryCards.chat_summary_cards && summaryCards.chat_summary_cards.length > 0) {
                     const cardDataMap = new Map();
                     summaryCards.chat_summary_cards.forEach(card => {
@@ -745,7 +756,7 @@ export default function HomePage() {
               try {
                 const matchesMsgs = mappedMessages.filter(m => m.kind === 'matches');
                 if (matchesMsgs.length > 0) {
-                  const allMatchesResult = await fetchChatMatches(ensuredChatId!, '');
+                  const allMatchesResult = await fetchChatMatches(ensuredChatId!, '', getRegion());
                   if (allMatchesResult.chat_matches && allMatchesResult.chat_matches.length > 0) {
                     const latest = allMatchesResult.chat_matches.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0];
                     let itemsLatest: any = latest.items;
@@ -813,7 +824,7 @@ export default function HomePage() {
           setMatchesOpen(true);
           setLoadingRecs(true);
           try {
-            const allMatchesResult = await fetchChatMatches(ensuredChatId!, '');
+            const allMatchesResult = await fetchChatMatches(ensuredChatId!, '', getRegion());
             const arr = Array.isArray(allMatchesResult?.chat_matches) ? allMatchesResult.chat_matches : [];
             arr.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
             const latest = arr[0];
@@ -872,7 +883,7 @@ export default function HomePage() {
       const summaryCardMsgs = mappedMessages.filter(m => m.kind === 'summary_card');
       if (summaryCardMsgs.length > 0) {
         try {
-          const summaryCards = await fetchChatSummaryCards(ensuredChatId!);
+          const summaryCards = await fetchChatSummaryCards(ensuredChatId!, getRegion());
           if (summaryCards.chat_summary_cards && summaryCards.chat_summary_cards.length > 0) {
             // Create a map of id -> data
             const cardDataMap = new Map();
@@ -901,7 +912,7 @@ export default function HomePage() {
       try {
         const matchesMsgs = mappedMessages.filter(m => m.kind === 'matches');
         if (matchesMsgs.length > 0) {
-          const allMatchesResult = await fetchChatMatches(ensuredChatId!, '');
+          const allMatchesResult = await fetchChatMatches(ensuredChatId!, '', getRegion());
           if (allMatchesResult.chat_matches && allMatchesResult.chat_matches.length > 0) {
             const latest = allMatchesResult.chat_matches.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0];
             let itemsLatest: any = latest.items;
@@ -1166,7 +1177,7 @@ export default function HomePage() {
         if (summaryCardMsgs.length > 0) {
           try {
             console.log("Loading summary cards for chat:", chatId);
-            const summaryCards = await fetchChatSummaryCards(chatId);
+            const summaryCards = await fetchChatSummaryCards(chatId, getRegion());
             console.log("Summary cards loaded:", summaryCards);
             
             if (summaryCards.chat_summary_cards && summaryCards.chat_summary_cards.length > 0) {
@@ -1197,7 +1208,7 @@ export default function HomePage() {
         try {
           const matchesMsgs = mappedMessages.filter(m => m.kind === 'matches');
           if (matchesMsgs.length > 0) {
-            const allMatchesResult = await fetchChatMatches(chatId, '');
+            const allMatchesResult = await fetchChatMatches(chatId, '', getRegion());
             if (allMatchesResult.chat_matches && allMatchesResult.chat_matches.length > 0) {
               const latest = allMatchesResult.chat_matches.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0];
               let itemsLatest: any = latest.items;
@@ -1271,6 +1282,19 @@ export default function HomePage() {
   const toggleSidebar = useCallback(() => {
     setShowSidebar(prev => !prev);
   }, []);
+
+  // Utility to get country/region from compliance localStorage
+  const getRegion = (): string | undefined => {
+    try {
+      const raw = localStorage.getItem('nirvana:compliance:v1');
+      if (!raw) return undefined;
+      const obj = JSON.parse(raw);
+      const region = (obj && typeof obj.region === 'string') ? obj.region.trim().toUpperCase() : undefined;
+      return region && region.length >= 2 ? region : undefined;
+    } catch {
+      return undefined;
+    }
+  };
 
   return (
     <div className="flex flex-col h-[100dvh] bg-black text-white bg-cover bg-center bg-no-repeat" 

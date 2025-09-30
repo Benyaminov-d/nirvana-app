@@ -2,6 +2,36 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import type { ChatSummary } from '../../services/api';
 
+function stripMarkdown(input: string): string {
+  try {
+    let s = String(input || '');
+    // Remove code fences and inline backticks
+    s = s.replace(/```[\s\S]*?```/g, ' ').replace(/`([^`]+)`/g, '$1');
+    // Remove headings ###, ##, #
+    s = s.replace(/^#{1,6}\s+/gm, '');
+    // Replace list markers -, *, +, and numbered lists "1."
+    s = s.replace(/^\s*[-*+]\s+/gm, '');
+    s = s.replace(/^\s*\d+\.\s+/gm, '');
+    // Blockquotes
+    s = s.replace(/^>\s?/gm, '');
+    // Links [text](url) -> text
+    s = s.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+    // Images ![alt](src) -> alt
+    s = s.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1');
+    // Bold/italic
+    s = s.replace(/\*\*([^*]+)\*\*/g, '$1');
+    s = s.replace(/\*([^*]+)\*/g, '$1');
+    s = s.replace(/_([^_]+)_/g, '$1');
+    // Tables: strip pipes
+    s = s.replace(/^\|.*\|$/gm, (m) => m.replace(/\|/g, ' ').trim());
+    // Collapse whitespace
+    s = s.replace(/\s+/g, ' ').trim();
+    return s;
+  } catch {
+    return input;
+  }
+}
+
 type Props = {
   chats: ChatSummary[];
   activeId?: string | null;
@@ -157,7 +187,7 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
                 <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(getLastTimestamp(c))}</div>
               </div>
               <div className="text-xs text-gray-400 mt-1 truncate">
-                {ellipsize(formatPreview(c))}
+                {ellipsize(stripMarkdown(formatPreview(c)))}
               </div>
             </button>
           ))}
@@ -207,7 +237,7 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
                 <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(getLastTimestamp(c))}</div>
               </div>
               <div className="text-xs text-gray-400 mt-1 truncate">
-                {ellipsize(formatPreview(c))}
+                {ellipsize(stripMarkdown(formatPreview(c)))}
               </div>
             </button>
           ))}
