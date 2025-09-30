@@ -37,6 +37,7 @@ export default function HomePage() {
   
   // UI state
   const [typing, setTyping] = useState(false);
+  const [progressText, setProgressText] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [locked, setLocked] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -580,6 +581,7 @@ export default function HomePage() {
 
       // Prefer SSE streaming; gracefully fall back to POST if fails
       let es: EventSource | null = null;
+      let lastProgressAt = 0;
       let acc = '';
       let sseFinalJson: any = null;
       let usedStreaming = false;
@@ -597,6 +599,20 @@ export default function HomePage() {
             } catch {
               return b64;
             }
+          };
+          const onProgress = (e: MessageEvent) => {
+            try {
+              const data = JSON.parse(e.data || '{}');
+              const now = Date.now();
+              // Throttle to once per 700ms and dedup by status+detail
+              if (now - lastProgressAt < 700) return;
+              lastProgressAt = now;
+              const status = String(data.status || '').trim();
+              const detail = String(data.detail || '').trim();
+              const pct = (typeof data.pct === 'number' && isFinite(data.pct)) ? ` ${Math.round(data.pct)}%` : '';
+              const txt = [status, detail].filter(Boolean).join(' • ') + pct;
+              if (txt) setProgressText(txt);
+            } catch {}
           };
           const onDelta = (e: MessageEvent) => {
             const raw = (e.data || '') as string;
@@ -642,6 +658,7 @@ export default function HomePage() {
           const onError = () => {
             reject(new Error('sse_error'));
           };
+          es!.addEventListener('progress', onProgress as any);
           es!.addEventListener('delta', onDelta as any);
           es!.addEventListener('final', onFinal as any);
           es!.addEventListener('error', onError as any);
@@ -653,6 +670,7 @@ export default function HomePage() {
         if (response.thread_id) setThreadId(response.thread_id);
       } finally {
         if (es) es.close();
+        setProgressText(undefined);
       }
 
       if (acc && !sseFinalJson) {
@@ -1340,6 +1358,7 @@ export default function HomePage() {
             loadingMore={loadingMore}
             hydrating={loading}
             typing={typing}
+            progressText={progressText}
             onTopReached={handleLoadMore}
           />
           

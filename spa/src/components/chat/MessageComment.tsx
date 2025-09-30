@@ -13,8 +13,8 @@ export const MessageComment: React.FC<{ text: string; extraClass?: string }> = (
     .replace(/([^.\n])\n(\d+\.)/g, '$1\n\n$2');
     
   return (
-    <div className={`flex justify-end ${extraClass || ''}`}>
-      <div className="chat-bubble chat-bubble--right chat-bubble--assistant max-w-[80%]">
+    <div className={`flex justify-start ${extraClass || ''}`}>
+      <div className="w-full">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{

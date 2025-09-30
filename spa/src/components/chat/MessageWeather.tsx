@@ -4,8 +4,8 @@ import remarkGfm from 'remark-gfm';
 import WeatherWidget from '../../components/WeatherWidget';
 
 export const MessageWeather: React.FC<{ text: string; extraClass?: string }> = ({ text, extraClass }) => (
-  <div className={`flex justify-end ${extraClass || ''}`}>
-    <div className="chat-bubble chat-bubble--right chat-bubble--assistant max-w-[80%]">
+  <div className={`flex justify-start ${extraClass || ''}`}>
+    <div className="w-full">
       <div className="space-y-2">
         <WeatherWidget text={text} />
         <div className="text-white/80 text-sm">

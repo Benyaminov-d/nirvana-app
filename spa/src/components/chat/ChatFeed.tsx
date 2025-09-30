@@ -14,9 +14,10 @@ type Props = {
   hydrating?: boolean;
   onTopReached?: () => void;
   typing?: boolean;
+  progressText?: string;
 };
 
-const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpen, onToggleProducts, loadingMore, hydrating, onTopReached, typing }, ref) => {
+const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpen, onToggleProducts, loadingMore, hydrating, onTopReached, typing, progressText }, ref) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   React.useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
   
@@ -39,9 +40,9 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
       
       <div className="min-h-full flex flex-col justify-end">
         {hydrating && (
-          <div className="flex justify-end mt-4">
-            <div className="chat-bubble chat-bubble--right max-w-[80%] animate-pulse">
-              <div className="h-6 bg-white/10 rounded w-48"></div>
+          <div className="flex justify-start mt-4">
+            <div className="w-full animate-pulse">
+              <div className="h-6 bg-white/10 rounded w-3/5"></div>
             </div>
           </div>
         )}
@@ -132,12 +133,23 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
 
         {/* Typing indicator moved here to be displayed as the last message */}
         {typing && (
-          <div className="flex justify-end mt-4">
-            <div className="chat-bubble chat-bubble--right typing max-w-[80%] min-h-[40px] flex items-center justify-center" data-testid="typing-indicator">
-              <span className="dot dot-1"></span>
-              <span className="dot dot-2"></span>
-              <span className="dot dot-3"></span>
-            </div>
+          <div className="flex justify-start mt-4">
+            {progressText ? (
+              <div className="min-h-[40px] flex items-center text-sm text-white/80" data-testid="progress-indicator">
+                <span className="mr-2">{progressText}</span>
+                <span className="typing flex items-center">
+                  <span className="dot dot-1"></span>
+                  <span className="dot dot-2"></span>
+                  <span className="dot dot-3"></span>
+                </span>
+              </div>
+            ) : (
+              <div className="typing min-h-[40px] flex items-center" data-testid="typing-indicator">
+                <span className="dot dot-1"></span>
+                <span className="dot dot-2"></span>
+                <span className="dot dot-3"></span>
+              </div>
+            )}
           </div>
         )}
       </div>

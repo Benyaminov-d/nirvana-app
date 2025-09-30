@@ -14,6 +14,16 @@ export function setBasicAuthCredentials(username: string, password: string): voi
   } catch {}
 }
 
+export function setCookie(name: string, value: string, days = 365, domain?: string) {
+  try {
+    const d = new Date();
+    d.setTime(d.getTime() + days*24*60*60*1000);
+    const expires = `expires=${d.toUTCString()}`;
+    const dm = domain ? `; domain=${domain}` : '';
+    document.cookie = `${name}=${encodeURIComponent(value)}; ${expires}; path=/${dm}; samesite=lax`;
+  } catch {}
+}
+
 export function clearBasicAuthCredentials(): void {
   try { localStorage.removeItem('basicAuthB64'); } catch {}
 }
