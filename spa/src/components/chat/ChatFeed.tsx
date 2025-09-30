@@ -31,7 +31,7 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
     if (el.scrollTop <= 24 && onTopReached) onTopReached();
   }, [onTopReached]);
   return (
-    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative p-3 pt-[60px] pb-[90px] bg-[#212121]">
+    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative p-3 pt-[60px] pb-[90px] bg-[#212121] overscroll-none touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
       {loadingMore && (
         <div className="absolute top-1 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
           <div className="h-5 w-5 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />

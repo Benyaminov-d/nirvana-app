@@ -183,7 +183,7 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
               } text-gray-200`}
             >
               <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-medium truncate">{c.title || 'New talk'}</div>
+                <div className="text-sm font-medium truncate">{c.title || 'New session'}</div>
                 <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(getLastTimestamp(c))}</div>
               </div>
               <div className="text-xs text-gray-400 mt-1 truncate">
@@ -197,12 +197,12 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
       {/* Mobile drawer */}
       <MobileDrawerLeft open={open} onClose={onClose}>
         <div className="flex items-center justify-between mb-4">
-          <div className="text-lg font-medium text-white trajan-text">Talks</div>
+          <div className="text-lg font-medium text-white trajan-text">Sessions</div>
           <button 
             type="button" 
             onClick={onCreate} 
             className="px-4 py-1.5 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-black font-medium transition-colors" 
-            aria-label="New talk"
+            aria-label="New session"
           >
             New
           </button>
@@ -233,7 +233,7 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
               } text-gray-200`}
             >
               <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-medium truncate">{c.title || 'New talk'}</div>
+                <div className="text-sm font-medium truncate">{c.title || 'New session'}</div>
                 <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(getLastTimestamp(c))}</div>
               </div>
               <div className="text-xs text-gray-400 mt-1 truncate">

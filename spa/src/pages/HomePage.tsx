@@ -1312,7 +1312,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-black text-white bg-cover bg-center bg-no-repeat" 
+    <div className="flex flex-col h-[100svh] bg-black text-white bg-cover bg-center bg-no-repeat" 
          style={{ 
            backgroundImage: `url(${new URL('../assets/bg.JPG', import.meta.url).toString()})`,
            backgroundBlendMode: 'overlay',
@@ -1330,7 +1330,7 @@ export default function HomePage() {
         />
 
         {/* Middle: Chat Messages */}
-        <div className="relative max-w-[50rem] mx-auto h-[100dvh] md:h-auto flex-1 flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
+        <div className="relative max-w-[50rem] mx-auto h-[100svh] md:h-auto flex-1 flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
           <div className="flex items-center justify-between mb-4 absolute top-0 left-0 h-[60px] w-full p-4 z-10 backdrop-blur-md">
             <div className="flex items-center">
               <button

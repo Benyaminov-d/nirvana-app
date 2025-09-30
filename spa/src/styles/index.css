@@ -42,7 +42,15 @@ body {
 
 /* Parity with legacy index.html styles */
 :root { --disc-h: 0px; --rib-h: 68px; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
+/* iOS Safari: lock body to visual viewport height to avoid bounce/extra scroll */
+@supports (height: 100svh) {
+  body { min-height: 100svh; height: 100svh; overflow: hidden; }
+}
+/* Fallback for browsers without svh */
+@supports not (height: 100svh) {
+  body { min-height: 100vh; height: 100vh; overflow: hidden; }
+}
 
 /* Liquid glass */
 .glass { 
