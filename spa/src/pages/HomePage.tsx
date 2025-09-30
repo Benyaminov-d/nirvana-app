@@ -1301,7 +1301,7 @@ export default function HomePage() {
          style={{ 
            backgroundImage: `url(${new URL('../assets/bg.JPG', import.meta.url).toString()})`,
            backgroundBlendMode: 'overlay',
-           backgroundColor: 'rgba(0,0,0,0.3)'
+           backgroundColor: 'rgb(35 35 35 / 83%)'
          }}>
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Talks List */}
