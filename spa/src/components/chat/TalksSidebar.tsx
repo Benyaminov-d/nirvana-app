@@ -150,12 +150,12 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
       {/* Desktop sidebar */}
       <div className={`${open ? 'hidden md:flex' : 'hidden'} md:flex-col md:w-64 glass nv-glass--inner-hairline border border-white/10 rounded-2xl p-2 m-2 md:h-[calc(100dvh-1rem)] md:overflow-hidden`}>
         <div className="flex items-center justify-between mb-4">
-          <div className="text-lg font-medium text-white trajan-text">Talks</div>
+          <div className="text-lg font-medium text-white trajan-text">Sessions</div>
           <button 
             type="button" 
             onClick={onCreate} 
             className="px-4 py-1.5 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-black font-medium transition-colors" 
-            aria-label="New talk"
+            aria-label="New session"
           >
             New
           </button>

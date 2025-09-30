@@ -1400,13 +1400,13 @@ export default function HomePage() {
                 {/* Typing indicator in the bottom right corner */}
                 {/* Typing indicator removed from here - now handled in ChatFeed component */}
               </div>
-                          <button
+              <button
                 type="submit" 
                 disabled={locked} 
                 className="h-[40px] px-5 mr-1 bg-[#c19658] rounded-xl text-black hover:bg-[#d1a668] transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <span className="text-sm">Search</span>
-                          </button>
+                <span className="text-sm">Enter</span>
+              </button>
             </form>
               </div>
               </div>
