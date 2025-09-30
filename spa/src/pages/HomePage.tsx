@@ -71,6 +71,7 @@ export default function HomePage() {
     chatIdRef.current = chatId;
   }, [chatId]);
 
+
   // Welcome message for fresh chats / no history
   const createWelcomeMessage = (): ChatMessage => ({
     key: `welcome-${Date.now()}`,
@@ -526,6 +527,20 @@ export default function HomePage() {
     checkMatches();
     return () => { cancelled = true; };
   }, [chatId]);
+
+  // On desktop only, open both panels by default
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined' || !window.matchMedia) return;
+      const isDesktop = window.matchMedia('(min-width: 1024px)').matches; // Tailwind lg breakpoint
+      if (!isDesktop) return;
+      if (!showSidebar) setShowSidebar(true);
+      if (!showRight) setShowRight(true);
+      if (hasMatchesInChat && !matchesOpen) {
+        handleToggleProducts();
+      }
+    } catch {}
+  }, [chatId, hasMatchesInChat, matchesOpen, showSidebar, showRight, handleToggleProducts]);
 
   // Handle user message submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1315,7 +1330,7 @@ export default function HomePage() {
         />
 
         {/* Middle: Chat Messages */}
-        <div className="relative h-[100dvh] md:h-auto flex-1 flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
+        <div className="relative max-w-[50rem] mx-auto h-[100dvh] md:h-auto flex-1 flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
           <div className="flex items-center justify-between mb-4 absolute top-0 left-0 h-[60px] w-full p-4 z-10 backdrop-blur-md">
             <div className="flex items-center">
               <button
