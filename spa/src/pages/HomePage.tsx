@@ -108,7 +108,7 @@ export default function HomePage() {
   
   // Refs
   const initialLoadedRef = useRef(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const chatFeedRef = useRef<HTMLDivElement>(null);
   const stickToBottomRef = useRef(true);
   const { setComplianceText } = useCompliance();
@@ -668,6 +668,11 @@ export default function HomePage() {
     
     const userInput = inputRef.current.value.trim();
     inputRef.current.value = '';
+    try { // reset autosize height after sending
+      const el = inputRef.current as HTMLTextAreaElement;
+      el.style.height = 'auto';
+      el.style.overflowY = 'hidden';
+    } catch {}
     
     // Ensure we have a chat id (avoid duplicate creation due to async state)
     const ensuredChatId = await ensureChatId();
@@ -1564,14 +1569,28 @@ export default function HomePage() {
 
               <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }}>
                 <form onSubmit={handleSubmit} className="flex items-center gap-3 border border-white/20 rounded-xl glass nv-glass--inner-hairline p-1">
-                  <div className="px-4 py-3 flex-1 relative">
-                    <input 
-                      ref={inputRef} 
-                      type="text" 
-                      placeholder="Say anything.." 
-                      className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 leading-none" 
-                      disabled={locked} 
-                    />
+              <div className="px-4 py-3 flex-1 relative">
+                <textarea
+                  ref={inputRef}
+                  rows={1}
+                  placeholder="Say anything.."
+                  className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 leading-6 min-h-[20px] max-h-[140px] resize-none overflow-hidden"
+                  disabled={locked}
+                  onInput={(e)=>{
+                    const el = e.currentTarget;
+                    el.style.height = 'auto';
+                    const maxH = 140;
+                    const newH = Math.min(el.scrollHeight, maxH);
+                    el.style.height = `${newH}px`;
+                    el.style.overflowY = el.scrollHeight > maxH ? 'auto' : 'hidden';
+                  }}
+                  onKeyDown={(e)=>{
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit(e as any);
+                    }
+                  }}
+                />
                   </div>
                   <button
                     type="submit" 
