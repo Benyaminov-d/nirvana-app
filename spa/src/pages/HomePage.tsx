@@ -1560,7 +1560,7 @@ export default function HomePage() {
           />
           
 
-          <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: `calc(${12 + Math.max(0, keyboardInset)}px)` }}>
+          <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }}>
             <form onSubmit={handleSubmit} className="flex items-center gap-3 border border-white/20 rounded-xl glass nv-glass--inner-hairline p-1">
               <div className="px-4 py-3 flex-1 relative">
                 <input 
