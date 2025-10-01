@@ -43,16 +43,28 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
   return (
     <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative p-3 pt-[60px] bg-[#212121] overscroll-none touch-pan-y" style={containerStyle}>
       {loadingMore && (
-        <div className="absolute top-1 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
           <div className="h-5 w-5 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />
         </div>
       )}
       
       <div className="min-h-full flex flex-col justify-end">
         {hydrating && (
-          <div className="flex justify-start mt-4">
-            <div className="w-full animate-pulse">
-              <div className="h-6 bg-white/10 rounded w-3/5"></div>
+          <div className="mt-4 space-y-3">
+            <div className="flex justify-start">
+              <div className="animate-pulse">
+                <div className="h-7 bg-white/10 rounded-md w-3/4"></div>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <div className="animate-pulse">
+                <div className="h-7 bg-white/10 rounded-md w-4/5"></div>
+              </div>
+            </div>
+            <div className="flex justify-start">
+              <div className="animate-pulse">
+                <div className="h-7 bg-white/10 rounded-md w-2/3"></div>
+              </div>
             </div>
           </div>
         )}

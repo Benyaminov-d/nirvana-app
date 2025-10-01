@@ -4,6 +4,8 @@ import EnhancedProductDisplay from '../../components/EnhancedProductDisplay';
 import ProductHeader from '../../components/ProductHeader';
 import { formatNegPct } from '../../utils/formatters';
 import { createPortal } from 'react-dom';
+import { sendPdfEmail } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 const MobileDrawerRight: React.FC<{ open: boolean; onClose?: () => void; children: React.ReactNode }>
   = ({ open, onClose, children }) => {
   const [mounted, setMounted] = React.useState(false);
@@ -82,6 +84,115 @@ type Props = {
 const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, selected, loadingRecs, matches, asOf, onShowScoreInfo, onAskAboutProduct, onClose }) => {
   const [showReturns, setShowReturns] = useState(false);
   const [tooltipProduct, setTooltipProduct] = useState<{symbol: string; name: string; x: number; y: number} | null>(null);
+  const [busy, setBusy] = useState(false);
+  const { user } = useAuth();
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [ccText, setCcText] = useState('');
+
+  const loadJsPdf = React.useCallback(async () => {
+    const w: any = window as any;
+    if (w.jspdf && w.jspdf.jsPDF) return w.jspdf.jsPDF;
+    await new Promise<void>((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+      s.async = true; s.onload = () => resolve(); s.onerror = () => reject(new Error('jsPDF load failed'));
+      document.body.appendChild(s);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js';
+      s.async = true; s.onload = () => resolve(); s.onerror = () => reject(new Error('autoTable load failed'));
+      document.body.appendChild(s);
+    });
+    return (window as any).jspdf.jsPDF;
+  }, []);
+
+  const createPdf = React.useCallback(async (list: RecommendationItem[], opts?: { forEmail?: boolean }) => {
+    const jsPDFCtor: any = await loadJsPdf();
+    const doc = new jsPDFCtor({ unit: 'pt', format: 'a4', compress: true });
+    const marginX = 48; let y = 64;
+
+    // Header with logo (if available)
+    const toDataUrl = async (url: string): Promise<string> => {
+      const res = await fetch(url); const b = await res.blob();
+      return await new Promise((resolve) => { const r = new FileReader(); r.onload = () => resolve(String(r.result)); r.readAsDataURL(b); });
+    };
+    try {
+      if (!opts?.forEmail) {
+        const logoUrl = new URL('../../assets/NirvanaFireFlyLogo.png', import.meta.url).toString();
+        const dataUrl = await toDataUrl(logoUrl);
+        // Preserve aspect ratio
+        const getSize = async (src: string): Promise<{ w: number; h: number }> => {
+          return await new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve({ w: img.naturalWidth || 1, h: img.naturalHeight || 1 });
+            img.src = src;
+          });
+        };
+        const { w: iw, h: ih } = await getSize(dataUrl);
+        const desiredH = 54;
+        const scale = desiredH / (ih || 1);
+        const targetW = Math.round((iw || 1) * scale);
+        // Use stronger compression for image to keep PDF small
+        (doc as any).addImage(dataUrl, 'PNG', marginX, y - 40, targetW, desiredH, undefined, 'SLOW');
+      }
+    } catch {}
+
+    doc.setFontSize(20); doc.text('Nirvana Products and Scores', marginX, y += 34);
+    doc.setFontSize(12); doc.setTextColor(80);
+    doc.text(`Generated on ${new Date().toLocaleString('en-GB')}`, marginX, y += 18);
+    doc.setTextColor(0);
+
+    const head = [['Symbol', 'Name', 'Return (ann.)', 'Compass score']];
+    const rows = (list || []).slice(0, opts?.forEmail ? 20 : 40).map((m) => {
+      const retRaw: any = (m as any).annualized_return;
+      const ret = typeof retRaw === 'object' && retRaw ? retRaw.value_pct : (typeof retRaw === 'number' ? retRaw * 100 : null);
+      const retStr = (ret != null && isFinite(ret)) ? `${Number(ret).toFixed(2)}%` : '-';
+      const score = (m as any).compass_score != null ? String((m as any).compass_score) : '-';
+      return [m.symbol, m.name, retStr, score];
+    });
+
+    (doc as any).autoTable({
+      startY: y + 16,
+      head,
+      body: rows,
+      styles: { fontSize: 10, cellPadding: 6, overflow: 'linebreak' },
+      headStyles: { fillColor: [193, 150, 88], textColor: 0 },
+      columnStyles: { 0: { cellWidth: 72 }, 2: { halign: 'right', cellWidth: 90 }, 3: { halign: 'right', cellWidth: 100 } },
+      margin: { left: marginX, right: marginX },
+    });
+
+    // Footer disclaimer on every page
+    const disclaimer =
+      'This material is provided for informational purposes only and does not constitute investment advice, an offer '
+      + 'or solicitation to buy or sell any financial instrument, or a recommendation for any strategy. Past performance '
+      + 'is not indicative of future results. All investing involves risk, including possible loss of principal.';
+    try {
+      const total = (doc as any).getNumberOfPages ? (doc as any).getNumberOfPages() : doc.getNumberOfPages();
+      for (let p = 1; p <= total; p++) {
+        (doc as any).setPage(p);
+        const pageW = (doc as any).internal.pageSize.getWidth();
+        const pageH = (doc as any).internal.pageSize.getHeight();
+        const lines = (doc as any).splitTextToSize(disclaimer, pageW - marginX * 2);
+        doc.setFontSize(8);
+        doc.setTextColor(120);
+        doc.text(lines, marginX, pageH - 22);
+        doc.setTextColor(0);
+      }
+    } catch {}
+
+    const arrayBuf: ArrayBuffer = doc.output('arraybuffer');
+    const toBase64 = (buf: ArrayBuffer): string => {
+      const bytes = new Uint8Array(buf);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      return btoa(binary);
+    };
+    const base64 = toBase64(arrayBuf);
+    const blob: Blob = doc.output('blob');
+    return { base64, blob };
+  }, [loadJsPdf]);
   // Handle closing tooltip when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -267,7 +378,81 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
       {/* Desktop panel */}
       <div className={`${showRight ? 'hidden md:block' : 'hidden'} md:w-80 glass nv-glass--inner-hairline border border-white/10 rounded-2xl p-4 m-2 md:h-[calc(100dvh-1rem)] md:overflow-auto shadow-lg relative`}>
         {renderContent()}
+        {/* Bottom fixed actions - visible when there are products */}
+        {matches && matches.length > 0 && (
+          <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent z-10">
+            <div className="w-full flex items-center justify-between gap-2">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={async () => {
+                  try {
+                    setBusy(true);
+                    const { blob } = await createPdf(matches);
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'nirvana_recommendations.pdf';
+                    a.click();
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+              >
+                Download PDF
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setShowEmailModal(true)}
+                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+              >
+                Send by Email
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Send by Email modal */}
+      {showEmailModal && createPortal(
+        <div className="fixed inset-0 z-[80] flex items-end md:items-center justify-center">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowEmailModal(false)} />
+          <div className="relative w-full md:w-[520px] bg-[#181818] border border-white/10 rounded-t-2xl md:rounded-2xl p-4 md:p-6 m-0 md:m-4">
+            <div className="text-lg font-medium text-white mb-4">Send by Email</div>
+            <div className="space-y-3">
+              <div>
+                <div className="text-xs text-gray-400 mb-1">Recipient</div>
+                <input value={user?.email || ''} disabled className="w-full bg-white/5 text-white px-3 py-2 rounded border border-white/10 disabled:opacity-60" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-400 mb-1">CC (comma-separated)</div>
+                <textarea value={ccText} onChange={(e)=> setCcText(e.target.value)} placeholder="name1@example.com, name2@example.com" className="w-full min-h-[80px] bg-white/5 text-white px-3 py-2 rounded border border-white/10 disabled:opacity-60" disabled={busy} />
+              </div>
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" className="px-3 py-2 rounded bg-white/10 text-gray-200 border border-white/20 disabled:opacity-60" onClick={()=> setShowEmailModal(false)} disabled={busy}>Cancel</button>
+              <button type="button" className="px-4 py-2 rounded bg-[#c19658] text-black font-medium disabled:opacity-60" disabled={busy} onClick={async ()=>{
+                if (!matches || matches.length === 0) { setShowEmailModal(false); return; }
+                try {
+                  setBusy(true);
+                  const items = (matches || []).slice(0, 20).map(m => `${m.symbol} — ${m.name}`);
+                  const html = `<div style=\"font-family:Inter,Arial,sans-serif;color:#111\"><div style=\"display:flex;align-items:center;gap:8px;margin-bottom:12px\"><strong>Nirvana App</strong></div><h2 style=\"margin:0 0 8px 0\">Your product short‑list</h2><p style=\"margin:0 0 12px 0;color:#333\">Please find the attached PDF with your shortlisted products. This message was generated by the Nirvana App.</p><ol>${items.map(i => `<li>${i}</li>`).join('')}</ol></div>`;
+                  const { base64 } = await createPdf(matches, { forEmail: true });
+                  const toEmail = user?.email || '';
+                  const ccList = (ccText || '').split(',').map(s=> s.trim()).filter(Boolean);
+                  await sendPdfEmail(toEmail, 'Nirvana Products and Scores', html, 'nirvana_recommendations.pdf', base64, ccList);
+                  setShowEmailModal(false);
+                  alert('Email scheduled to send.');
+                } finally {
+                  setBusy(false);
+                }
+              }}>Send</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Mobile drawer */}
       <MobileDrawerRight open={showRight} onClose={onClose}>

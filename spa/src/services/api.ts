@@ -330,3 +330,22 @@ export async function fetchHistoricalData(symbol: string, period: string = "1Y")
     return null;
   }
 }
+
+// Email utilities
+export async function sendPdfEmail(
+  toEmail: string,
+  subject: string,
+  bodyHtml: string,
+  filename: string,
+  pdfBase64: string,
+  cc?: string[]
+): Promise<{ success: boolean }> {
+  return await postJSON<{ success: boolean }>(`/contact/send-pdf`, {
+    to_email: toEmail,
+    subject,
+    body_html: bodyHtml,
+    filename,
+    pdf_base64: pdfBase64,
+    cc: Array.isArray(cc) ? cc : undefined,
+  });
+}
