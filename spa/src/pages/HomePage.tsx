@@ -109,6 +109,7 @@ export default function HomePage() {
   const initialLoadedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatFeedRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
   const { setComplianceText } = useCompliance();
   const chatIdRef = useRef<string | null>(chatIdParam || null);
   const creatingChatRef = useRef(false);
@@ -650,7 +651,8 @@ export default function HomePage() {
         const uniqueMessages = dedupConsecutive(combined);
         console.log("After deduplication (user msg):", uniqueMessages);
         
-        // Auto-scroll to bottom after adding new message
+        // Force auto-scroll to bottom on user send
+        stickToBottomRef.current = true;
         setTimeout(() => {
           if (chatFeedRef.current) {
             chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
@@ -733,12 +735,14 @@ export default function HomePage() {
                 out.push(assistantMsg);
                 return out;
               });
-              // Keep view pinned to bottom while streaming
-              setTimeout(() => {
-                if (chatFeedRef.current) {
-                  chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
-                }
-              }, 0);
+              // Auto-scroll during streaming only if user is at bottom
+              if (stickToBottomRef.current) {
+                setTimeout(() => {
+                  if (chatFeedRef.current) {
+                    chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
+                  }
+                }, 0);
+              }
             }
           };
           const onFinal = (e: MessageEvent) => {
@@ -877,8 +881,8 @@ export default function HomePage() {
                 }
               } catch {}
 
-              const uniqueMessages = dedupConsecutive(mappedMessages);
-              setMessages(uniqueMessages);
+          const uniqueMessages = dedupConsecutive(mappedMessages);
+          setMessages(uniqueMessages);
             }
           } catch (e) {
             console.error('Failed to refresh messages after tool', e);
@@ -1042,13 +1046,15 @@ export default function HomePage() {
       console.log("After final deduplication:", uniqueMessages);
       setMessages(uniqueMessages);
       
-      // Auto-scroll to bottom after refreshing messages from server
-      setTimeout(() => {
-        if (chatFeedRef.current) {
-          console.log("Auto-scrolling to bottom after server refresh");
-          chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
-        }
-      }, 150);
+      // Auto-scroll to bottom after server refresh only if user sticks to bottom
+      if (stickToBottomRef.current) {
+        setTimeout(() => {
+          if (chatFeedRef.current) {
+            console.log("Auto-scrolling to bottom after server refresh");
+            chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
+          }
+        }, 150);
+      }
       
     } catch (e) {
       console.error('Error sending message', e);
@@ -1065,13 +1071,15 @@ export default function HomePage() {
       setTyping(false);
           console.log("Typing indicator deactivated (delayed)");
           
-          // Final scroll to bottom after typing indicator disappears
-          setTimeout(() => {
-            if (chatFeedRef.current) {
-              console.log("Final auto-scroll after typing indicator disappears");
-              chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
-            }
-          }, 50);
+          // Final scroll after typing indicator only if user sticks to bottom
+          if (stickToBottomRef.current) {
+            setTimeout(() => {
+              if (chatFeedRef.current) {
+                console.log("Final auto-scroll after typing indicator disappears");
+                chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
+              }
+            }, 50);
+          }
         }, minTypingTime - elapsedTime);
       } else {
         // Response took longer than minimum typing time
@@ -1079,13 +1087,15 @@ export default function HomePage() {
       setLocked(false);
         setTyping(false);
         
-        // Final scroll to bottom after typing indicator disappears
-        setTimeout(() => {
-          if (chatFeedRef.current) {
-            console.log("Final auto-scroll after typing indicator disappears");
-            chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
-          }
-        }, 50);
+        // Final scroll only if user sticks to bottom
+        if (stickToBottomRef.current) {
+          setTimeout(() => {
+            if (chatFeedRef.current) {
+              console.log("Final auto-scroll after typing indicator disappears");
+              chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
+            }
+          }, 50);
+        }
       }
     }
   };
@@ -1503,6 +1513,7 @@ export default function HomePage() {
             typing={typing}
             progressText={progressText}
             onTopReached={handleLoadMore}
+            onScrollPositionChange={({ atBottom }) => { stickToBottomRef.current = atBottom; }}
           />
           
 

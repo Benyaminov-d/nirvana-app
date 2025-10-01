@@ -15,9 +15,10 @@ type Props = {
   onTopReached?: () => void;
   typing?: boolean;
   progressText?: string;
+  onScrollPositionChange?: (pos: { atTop: boolean; atBottom: boolean }) => void;
 };
 
-const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpen, onToggleProducts, loadingMore, hydrating, onTopReached, typing, progressText }, ref) => {
+const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpen, onToggleProducts, loadingMore, hydrating, onTopReached, typing, progressText, onScrollPositionChange }, ref) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   React.useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
   
@@ -28,8 +29,11 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
   const handleScroll = React.useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
-    if (el.scrollTop <= 24 && onTopReached) onTopReached();
-  }, [onTopReached]);
+    const atTop = el.scrollTop <= 24;
+    const atBottom = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 24;
+    if (atTop && onTopReached) onTopReached();
+    if (onScrollPositionChange) onScrollPositionChange({ atTop, atBottom });
+  }, [onTopReached, onScrollPositionChange]);
   return (
     <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative p-3 pt-[60px] pb-[90px] bg-[#212121] overscroll-none touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
       {loadingMore && (
