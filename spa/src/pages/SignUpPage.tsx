@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { postJSON } from '../services/http';
 import AuthLayout from '../components/AuthLayout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCompliance, type Region } from '../context/ComplianceContext';
 
 export default function SignUpPage() {
   const { state: complianceState, accept: acceptCompliance } = useCompliance();
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -23,19 +24,19 @@ export default function SignUpPage() {
   }, [complianceState?.region]);
 
   const BASE_REGION_OPTIONS: { label: string; value: Region }[] = [
-    { label: 'Canada', value: 'CA' },
-    { label: 'Switzerland', value: 'CH' },
-    { label: 'China', value: 'CN' },
-    { label: 'EU/EEA', value: 'EU' },
-    { label: 'India', value: 'IN' },
-    { label: 'Japan', value: 'JP' },
     { label: 'United Kingdom', value: 'UK' },
-    { label: 'United States', value: 'US' },
+    // { label: 'Canada', value: 'CA' },
+    // { label: 'Switzerland', value: 'CH' },
+    // { label: 'China', value: 'CN' },
+    // { label: 'EU/EEA', value: 'EU' },
+    // { label: 'India', value: 'IN' },
+    // { label: 'Japan', value: 'JP' },
+    // { label: 'United States', value: 'US' },
   ];
 
   const REGION_OPTIONS: { label: string; value: Region | 'OTHER' }[] = [
     ...[...BASE_REGION_OPTIONS].sort((a, b) => a.label.localeCompare(b.label)),
-    { label: 'Other', value: 'OTHER' },
+    // { label: 'Other', value: 'OTHER' },
   ];
 
   const isAdult = (isoDate: string): boolean => {
@@ -88,25 +89,9 @@ export default function SignUpPage() {
       });
       // Mark compliance accepted locally too
       try { acceptCompliance(); } catch {}
-      setStatus('Account created successfully. Redirecting to subscription checkout...');
-      // Immediately start subscription checkout
-      try {
-        const res = await fetch('/api/v1/billing/checkout/subscription', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        });
-        const data = await res.json();
-        if (res.ok && data?.checkout_url) {
-          window.location.href = data.checkout_url as string;
-          return;
-        }
-        // If no URL returned, keep the success message
-        setStatus('Account created. Please proceed to Account to start subscription.');
-      } catch {
-        setStatus('Account created. Please proceed to Account to start subscription.');
-      }
+      setStatus('Account created successfully. Please sign in to continue.');
+      navigate('/signin', { replace: true });
+      return;
     } catch (err: any) {
       setStatus('Registration failed. This email may already be in use.');
     } finally {

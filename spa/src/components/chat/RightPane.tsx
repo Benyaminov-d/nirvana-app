@@ -386,7 +386,7 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
   return (
     <>
       {/* Desktop panel */}
-      <div className={`${showRight ? 'hidden md:block' : 'hidden'} md:w-80 glass nv-glass--inner-hairline border border-white/10 rounded-2xl p-4 m-2 md:h-[calc(100dvh-1rem)] md:overflow-auto shadow-lg relative`}>
+      <div className={`${showRight ? 'hidden md:block' : 'hidden'} md:w-80 flex-shrink-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl p-4 m-2 md:h-[calc(100dvh-1rem)] md:overflow-auto shadow-lg relative`}>
         {renderContent()}
         {/* Bottom fixed actions - visible when there are products */}
         {matches && matches.length > 0 && (
