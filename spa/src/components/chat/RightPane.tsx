@@ -139,12 +139,22 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
       }
     } catch {}
 
-    doc.setFontSize(20); doc.text('Nirvana Products and Scores', marginX, y += 34);
+    // Title with timestamp: Nirvana Proximity search results (timestamp)
+    const now = new Date();
+    const tsForTitle = (() => {
+      const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+      const day = now.getDate();
+      const month = now.toLocaleString('en-GB', { month: 'long' });
+      const year = now.getFullYear();
+      return `${time} ${day} ${month} ${year}`;
+    })();
+    doc.setFontSize(20);
+    doc.text(`Nirvana Proximity Search Results`, marginX, y += 34);
     doc.setFontSize(12); doc.setTextColor(80);
-    doc.text(`Generated on ${new Date().toLocaleString('en-GB')}`, marginX, y += 18);
+    doc.text(`Generated on ${now.toLocaleString('en-GB')}`, marginX, y += 18);
     doc.setTextColor(0);
 
-    const head = [['Symbol', 'Name', 'Return (ann.)', 'Compass score']];
+    const head = [['Symbol', 'Name', 'Return (ann.)', 'Search Relevance Index']];
     const rows = (list || []).slice(0, opts?.forEmail ? 20 : 40).map((m) => {
       const retRaw: any = (m as any).annualized_return;
       const ret = typeof retRaw === 'object' && retRaw ? retRaw.value_pct : (typeof retRaw === 'number' ? retRaw * 100 : null);
@@ -391,7 +401,13 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                     const { blob } = await createPdf(matches);
                     const a = document.createElement('a');
                     a.href = URL.createObjectURL(blob);
-                    a.download = 'nirvana_recommendations.pdf';
+                    const d = new Date();
+                    const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    const day = d.getDate();
+                    const month = d.toLocaleString('en-GB', { month: 'long' });
+                    const year = d.getFullYear();
+                    const tsName = `${time}_${day}_${month}_${year}`.replace(/\s+/g, '_');
+                    a.download = `Nirvana_Proximity_Search_Results_${tsName}.pdf`;
                     a.click();
                   } finally {
                     setBusy(false);
@@ -446,12 +462,12 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                   }));
                   const shortlistHtml = preview.map(p => `
                         <tr>
-                          <td style="background:#0f131b;border:1px solid #1f2530;border-radius:8px;padding:12px;">
-                            <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#ffffff;font-size:14px;line-height:20px;font-weight:600;">
+                          <td style="background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;padding:12px;">
+                            <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#111827;font-size:14px;line-height:20px;font-weight:600;">
                               ${p.rank}. ${p.ticker} — ${p.name}
                             </div>
-                            <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#9aa3ae;font-size:12px;line-height:18px;margin-top:2px;">
-                              ${p.category} · ${p.currency} · Compass Score: <strong style="color:#e6e8ec;">${p.score}</strong>
+                            <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#374151;font-size:12px;line-height:18px;margin-top:2px;">
+                              ${p.category} · ${p.currency} · Search Relevance Index: <strong style="color:#111827;">${p.score}</strong>
                             </div>
                           </td>
                         </tr>`).join('');
@@ -467,6 +483,15 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                     }
                   })();
                   const sendTime = new Date().toLocaleString('en-GB');
+                  const subjectTs = (() => {
+                    const d = new Date();
+                    const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    const day = d.getDate();
+                    const month = d.toLocaleString('en-GB', { month: 'long' });
+                    const year = d.getFullYear();
+                    return `${time} ${day} ${month} ${year}`;
+                  })();
+                  const subject = `Nirvana Proximity search results ${subjectTs}`;
                   const appLink = `${window.location.origin}`;
                   const supportEmail = 'support@nirvana.bm';
 
@@ -485,27 +510,27 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
       }
     </style>
   </head>
-  <body style="margin:0;padding:0;background:#0f1115;color:#e6e8ec;">
+  <body style="margin:0;padding:0;background:#f7f9fc;color:#111827;">
     <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;">
       Shortlist filtered by Nirvana Standard and ordered by Compass Score (0–10,000). PDF attached.
     </span>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="background:#0f1115;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="background:#f7f9fc;">
       <tr>
         <td align="center">
           <table role="presentation" class="container" width="640" cellspacing="0" cellpadding="0" border="0" style="width:640px;max-width:640px;">
             <tr>
               <td class="px" style="padding:24px 32px 8px 32px;">
-                <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#8b96a5; font-size:12px;">${sendTime}</div>
-                <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin-top:8px; font-weight:700; font-size:24px; line-height:30px; color:#ffffff;">Nirvana - Products & Scores</div>
+                <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#6b7280; font-size:12px;">${sendTime}</div>
+                <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin-top:8px; font-weight:700; font-size:24px; line-height:30px; color:#111827;">${subject}</div>
               </td>
             </tr>
             <tr>
               <td class="px" style="padding:8px 32px 0 32px;">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#141821;border:1px solid #1f2530;border-radius:12px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;">
                   <tr>
                     <td style="padding:24px 24px 8px 24px;">
-                      <div class="h1" style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-size:24px; line-height:32px; color:#ffffff; font-weight:700;">${displayName}, Proximity Search results are ready</div>
-                      <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#c6ccd6; font-size:14px; line-height:22px; margin-top:8px;">
+                      <div class="h1" style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-size:24px; line-height:32px; color:#111827; font-weight:700;">Dear ${displayName}, your Proximity search results are below</div>
+                      <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#374151; font-size:14px; line-height:22px; margin-top:8px;">
                         Your Proximity Search results are ready. Please find them attached and summarized in the table below.
                       </div>
                     </td>
@@ -518,9 +543,9 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                     </td>
                   </tr>
                   <tr>
-                    <td style="padding:16px 24px 24px 24px;border-top:1px solid #1f2530;">
-                      <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#8b96a5;font-size:12px;line-height:18px;">
-                        Nirvana is an analytics platform (non-custodial). This is not investment advice nor an offer to transact; all decisions are made by you together with a licensed financial institution/adviser.
+                    <td style="padding:16px 24px 24px 24px;border-top:1px solid #e5e7eb;">
+                      <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#6b7280;font-size:12px;line-height:18px;">
+                        Search results — not advice. Search results are not advice nor an offer to transact. A high search relevance index does not mean "good for you".
                       </div>
                     </td>
                   </tr>
@@ -529,8 +554,8 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
             </tr>
             <tr>
               <td class="px" style="padding:16px 32px 48px 32px;">
-                <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#8b96a5;font-size:12px;line-height:18px;">
-                  Questions? Email us at <a href="mailto:${supportEmail}" style="color:#9ac1ff;text-decoration:none;">${supportEmail}</a>.
+                <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#6b7280;font-size:12px;line-height:18px;">
+                  Questions? Email us at <a href="mailto:${supportEmail}" style="color:#1d4ed8;text-decoration:none;">${supportEmail}</a>.
                 </div>
               </td>
             </tr>
@@ -543,9 +568,15 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                   const { base64 } = await createPdf(matches, { forEmail: true });
                   const toEmail = user?.email || '';
                   const ccList = (ccText || '').split(',').map(s=> s.trim()).filter(Boolean);
-                  await sendPdfEmail(toEmail, 'Your personalized shortlist and Compass Scores', html, 'nirvana_recommendations.pdf', base64, ccList);
+                  const d2 = new Date();
+                  const time2 = d2.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                  const day2 = d2.getDate();
+                  const month2 = d2.toLocaleString('en-GB', { month: 'long' });
+                  const year2 = d2.getFullYear();
+                  const tsFile = `${time2}_${day2}_${month2}_${year2}`.replace(/\s+/g, '_');
+                  await sendPdfEmail(toEmail, subject, html, `Nirvana_Proximity_Search_Results_${tsFile}.pdf`, base64, ccList);
                   setShowEmailModal(false);
-                  alert('Email scheduled to send.');
+                  alert('Email is sent.');
                 } finally {
                   setBusy(false);
                 }
@@ -571,7 +602,20 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                     const { blob } = await createPdf(matches);
                     const a = document.createElement('a');
                     a.href = URL.createObjectURL(blob);
-                    a.download = 'nirvana_recommendations.pdf';
+                    const d = new Date();
+                    const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    const day = d.getDate();
+                    const month = d.toLocaleString('en-GB', { month: 'long' });
+                    const year = d.getFullYear();
+                    const tsName = `${time}_${day}_${month}_${year}`.replace(/\s+/g, '_');
+                    a.download = `Nirvana_Proximity_Search_Results_${tsName}.pdf`;
+                    const d3 = new Date();
+                    const time3 = d3.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    const day3 = d3.getDate();
+                    const month3 = d3.toLocaleString('en-GB', { month: 'long' });
+                    const year3 = d3.getFullYear();
+                    const tsName3 = `${time3}_${day3}_${month3}_${year3}`.replace(/\s+/g, '_');
+                    a.download = `Nirvana_Proximity_Search_Results_${tsName3}.pdf`;
                     a.click();
                   } finally {
                     setBusy(false);
