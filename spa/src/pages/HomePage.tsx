@@ -626,10 +626,10 @@ export default function HomePage() {
     if (!vv) return;
     const handler = () => {
       try {
-        const heightDiff = Math.max(0, window.innerHeight - vv.height);
-        // Add only when viewport is resized by keyboard and page is zoom level ~1
-        const inset = (heightDiff > 0 && vv.scale <= 1.05) ? Math.round(heightDiff) : 0;
-        setKeyboardInset(inset);
+        const bottom = Math.max(0, (vv.height + vv.offsetTop) - window.innerHeight);
+        const byResize = Math.max(0, window.innerHeight - vv.height);
+        const inset = Math.max(bottom, byResize);
+        setKeyboardInset(inset > 0 ? Math.round(inset) : 0);
       } catch {
         setKeyboardInset(0);
       }
@@ -637,8 +637,19 @@ export default function HomePage() {
     handler();
     vv.addEventListener('resize', handler);
     vv.addEventListener('scroll', handler);
+    window.addEventListener('orientationchange', handler);
+    window.addEventListener('focusin', handler);
+    window.addEventListener('focusout', handler);
     return () => {
-      try { vv.removeEventListener('resize', handler); vv.removeEventListener('scroll', handler); } catch {}
+      try {
+        vv.removeEventListener('resize', handler);
+        vv.removeEventListener('scroll', handler);
+      } catch {}
+      try {
+        window.removeEventListener('orientationchange', handler);
+        window.removeEventListener('focusin', handler);
+        window.removeEventListener('focusout', handler);
+      } catch {}
     };
   }, []);
 
@@ -1549,7 +1560,7 @@ export default function HomePage() {
           />
           
 
-          <div className="absolute bottom-0 left-0 right-0 p-3 z-10" style={{ paddingBottom: 12 + Math.max(0, keyboardInset) }}>
+          <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: `calc(${12 + Math.max(0, keyboardInset)}px)` }}>
             <form onSubmit={handleSubmit} className="flex items-center gap-3 border border-white/20 rounded-xl glass nv-glass--inner-hairline p-1">
               <div className="px-4 py-3 flex-1 relative">
                 <input 

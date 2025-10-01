@@ -37,7 +37,7 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
   }, [onTopReached, onScrollPositionChange]);
   const containerStyle: React.CSSProperties = {
     WebkitOverflowScrolling: 'touch',
-    paddingBottom: 90 + Math.max(0, bottomInset),
+    paddingBottom: `calc(${90 + Math.max(0, bottomInset)}px + env(safe-area-inset-bottom))`,
   };
 
   return (
