@@ -52,6 +52,13 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
   body { min-height: 100vh; height: 100vh; overflow: hidden; }
 }
 
+/* iOS safe-area helper */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .ios-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 /* Liquid glass */
 .glass { 
   background: var(--colour-glass-bg);
