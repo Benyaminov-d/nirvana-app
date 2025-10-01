@@ -559,6 +559,39 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
       {/* Mobile drawer */}
       <MobileDrawerRight open={showRight} onClose={onClose}>
         {renderContent()}
+        {matches && matches.length > 0 && (
+          <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent z-10 md:hidden">
+            <div className="w-full flex items-center justify-between gap-2">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={async () => {
+                  try {
+                    setBusy(true);
+                    const { blob } = await createPdf(matches);
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'nirvana_recommendations.pdf';
+                    a.click();
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+              >
+                Download PDF
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setShowEmailModal(true)}
+                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+              >
+                Send by Email
+              </button>
+            </div>
+          </div>
+        )}
       </MobileDrawerRight>
     </>
   );
