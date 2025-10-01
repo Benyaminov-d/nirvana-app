@@ -16,9 +16,10 @@ type Props = {
   typing?: boolean;
   progressText?: string;
   onScrollPositionChange?: (pos: { atTop: boolean; atBottom: boolean }) => void;
+  bottomInset?: number;
 };
 
-const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpen, onToggleProducts, loadingMore, hydrating, onTopReached, typing, progressText, onScrollPositionChange }, ref) => {
+const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpen, onToggleProducts, loadingMore, hydrating, onTopReached, typing, progressText, onScrollPositionChange, bottomInset = 0 }, ref) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   React.useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
   
@@ -34,8 +35,13 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
     if (atTop && onTopReached) onTopReached();
     if (onScrollPositionChange) onScrollPositionChange({ atTop, atBottom });
   }, [onTopReached, onScrollPositionChange]);
+  const containerStyle: React.CSSProperties = {
+    WebkitOverflowScrolling: 'touch',
+    paddingBottom: 90 + Math.max(0, bottomInset),
+  };
+
   return (
-    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative p-3 pt-[60px] pb-[90px] bg-[#212121] overscroll-none touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative p-3 pt-[60px] bg-[#212121] overscroll-none touch-pan-y" style={containerStyle}>
       {loadingMore && (
         <div className="absolute top-1 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
           <div className="h-5 w-5 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />

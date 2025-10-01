@@ -45,6 +45,7 @@ export default function HomePage() {
   const [showTip, setShowTip] = useState(false);
   const [showRight, setShowRight] = useState(false);
   const [matchesOpen, setMatchesOpen] = useState(false);
+  const [keyboardInset, setKeyboardInset] = useState(0);
   
   // Pagination state
   const [msgOffset, setMsgOffset] = useState(0);
@@ -114,6 +115,8 @@ export default function HomePage() {
   const chatIdRef = useRef<string | null>(chatIdParam || null);
   const creatingChatRef = useRef(false);
   const userInteractedRef = useRef(false);
+  // Guard to avoid duplicate initial chat creation in React.StrictMode
+  const initialChatCreatedRef = useRef(false);
 
   useEffect(() => {
     chatIdRef.current = chatId;
@@ -616,6 +619,28 @@ export default function HomePage() {
       setShowRight(true);
     } catch {}
   }, [chatId]);
+
+  // iOS keyboard gap fix: adjust for visualViewport bottom inset
+  useEffect(() => {
+    const vv = (window as any).visualViewport as VisualViewport | undefined;
+    if (!vv) return;
+    const handler = () => {
+      try {
+        const heightDiff = Math.max(0, window.innerHeight - vv.height);
+        // Add only when viewport is resized by keyboard and page is zoom level ~1
+        const inset = (heightDiff > 0 && vv.scale <= 1.05) ? Math.round(heightDiff) : 0;
+        setKeyboardInset(inset);
+      } catch {
+        setKeyboardInset(0);
+      }
+    };
+    handler();
+    vv.addEventListener('resize', handler);
+    vv.addEventListener('scroll', handler);
+    return () => {
+      try { vv.removeEventListener('resize', handler); vv.removeEventListener('scroll', handler); } catch {}
+    };
+  }, []);
 
   // Handle user message submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1154,16 +1179,22 @@ export default function HomePage() {
           }
         } catch {}
 
-        // If no chats exist, create a new one
-        if ((!chatIdParam || chatsArray.length === 0) && !chatId) {
-          console.log("Creating new chat");
-          const newChat = await createChat();
-          console.log("New chat created:", newChat);
-          setChatId(newChat.id);
-          setChats([newChat]);
-          navigate(`/talk/${newChat.id}`);
-      return;
-    }
+        // If no chats exist, create a new one (idempotent guard for StrictMode)
+        if ((chatsArray.length === 0) && !chatId && !initialChatCreatedRef.current && !creatingChatRef.current) {
+          try {
+            creatingChatRef.current = true;
+            initialChatCreatedRef.current = true;
+            console.log("Creating new chat (initial)");
+            const newChat = await createChat();
+            console.log("New chat created:", newChat);
+            setChatId(newChat.id);
+            setChats([newChat]);
+            navigate(`/talk/${newChat.id}`);
+            return;
+          } finally {
+            creatingChatRef.current = false;
+          }
+        }
         // If current chat has >= 6 msgs and no title yet, request it once on load
         try {
           const current = (chatsArray || []).find((c: ChatSummary) => c.id === (chatIdParam || chatId));
@@ -1514,10 +1545,11 @@ export default function HomePage() {
             progressText={progressText}
             onTopReached={handleLoadMore}
             onScrollPositionChange={({ atBottom }) => { stickToBottomRef.current = atBottom; }}
+            bottomInset={keyboardInset}
           />
           
 
-          <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+          <div className="absolute bottom-0 left-0 right-0 p-3 z-10" style={{ paddingBottom: 12 + Math.max(0, keyboardInset) }}>
             <form onSubmit={handleSubmit} className="flex items-center gap-3 border border-white/20 rounded-xl glass nv-glass--inner-hairline p-1">
               <div className="px-4 py-3 flex-1 relative">
                 <input 
