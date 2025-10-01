@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
   email: string;
+  first_name?: string;
+  last_name?: string;
+  birthdate?: string;
+  region?: string;
 }
 
 interface AuthContextType {
@@ -39,7 +43,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         if (data.authenticated && data.email) {
-          setUser({ email: data.email });
+          setUser({ 
+            email: data.email,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            birthdate: data.birthdate,
+            region: data.region,
+          });
           setIsLoading(false);
           return true;
         }
@@ -72,7 +82,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         if (data.ok) {
-          setUser({ email: data.email });
+          setUser({ 
+            email: data.email,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            birthdate: data.birthdate,
+            region: data.region,
+          });
           setIsLoading(false);
           return true;
         }

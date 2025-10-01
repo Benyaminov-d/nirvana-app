@@ -226,7 +226,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto text-white">
+    <div className="p-6 max-w-4xl mx-auto text-white min-h-screen h-screen overflow-y-auto">
       <h1 className="text-2xl font-semibold mb-2">Account</h1>
       <p className="text-white/70 mb-6">{user?.email}</p>
 

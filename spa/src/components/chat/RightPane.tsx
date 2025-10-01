@@ -108,7 +108,13 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
     if (tooltipProduct && onAskAboutProduct) {
       onAskAboutProduct(tooltipProduct.symbol, tooltipProduct.name);
       setTooltipProduct(null);
-      if (onClose) onClose();
+      // Close only on mobile (drawer). Keep desktop pane open
+      try {
+        const isDesktop = typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(min-width: 768px)').matches;
+        if (!isDesktop && onClose) onClose();
+      } catch {
+        // Fallback: do not close on potential desktop environments
+      }
     }
   };
   
@@ -139,7 +145,28 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
       )}
 
       {!summary && !loadingRecs && matches.length === 0 && (
-        <div className="text-gray-300 text-sm">There are no products that meet our standard for your loss tolerance parameters.</div>
+        <div>
+          <div className="grid grid-cols-2 text-[11px] uppercase tracking-wider text-gray-400 mb-3">
+            <div>
+              <div>Search results</div>
+              <div className="text-gray-300 normal-case tracking-normal mt-1" style={{ color: '#ff7f50' }}>No AI used in search</div>
+            </div>
+            <div className="text-right justify-self-end">Search relevance index (Compass Score)</div>
+          </div>
+          <div className="space-y-3 mt-4 mb-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white/5 rounded-lg p-4 border border-white/5 shadow-sm">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="text-sm text-gray-100/40 font-medium blur-[6px] select-none">AAA{i + 1}</div>
+                    <div className="text-xs text-gray-400/50 truncate max-w-[220px] mt-1 blur-[6px] select-none">Product Name Placeholder</div>
+                  </div>
+                  <div className="w-20 h-4 bg-blue-700/50 rounded ml-4 blur-[6px]" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {!summary && matches.length > 0 && !loadingRecs && (

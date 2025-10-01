@@ -58,6 +58,52 @@ export default function HomePage() {
   const [loadingRecs, setLoadingRecs] = useState(false);
   const [asOf, setAsOf] = useState<string | null>(null);
   const [hasMatchesInChat, setHasMatchesInChat] = useState(false);
+  // Global matches shared across chats
+  const [globalMatches, setGlobalMatches] = useState<RecommendationItem[]>([]);
+  const [globalAsOf, setGlobalAsOf] = useState<string | null>(null);
+
+  // Shallow equality guard for recommendation lists to avoid state churn loops
+  const areRecommendationsEqual = useCallback((a: RecommendationItem[], b: RecommendationItem[]): boolean => {
+    if (a === b) return true;
+    if (!Array.isArray(a) || !Array.isArray(b)) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      const ai = a[i] as any; const bi = b[i] as any;
+      if (ai.symbol !== bi.symbol) return false;
+      if (ai.name !== bi.name) return false;
+      if (ai.compass_score !== bi.compass_score) return false;
+    }
+    return true;
+  }, []);
+
+  // Storage helpers for persisting global matches across reloads
+  const GLOBAL_MATCHES_KEY = 'nirvana:global_matches:v1';
+  const saveGlobalMatches = useCallback((items: RecommendationItem[], asOfVal: string | null) => {
+    try {
+      const payload = { items, as_of: asOfVal };
+      localStorage.setItem(GLOBAL_MATCHES_KEY, JSON.stringify(payload));
+    } catch {}
+  }, []);
+  const loadGlobalMatchesFromStorage = useCallback((): { items: RecommendationItem[]; as_of: string | null } | null => {
+    try {
+      const raw = localStorage.getItem(GLOBAL_MATCHES_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.items)) {
+        return { items: parsed.items, as_of: parsed.as_of || null };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Centralized updater for global matches (with equality + storage)
+  const updateGlobalMatches = useCallback((items: RecommendationItem[], asOfVal: string | null) => {
+    setGlobalMatches(prev => (areRecommendationsEqual(prev, items) ? prev : items));
+    setGlobalAsOf(prev => (prev === (asOfVal || null) ? prev : (asOfVal || null)));
+    saveGlobalMatches(items, asOfVal || null);
+  }, [areRecommendationsEqual, saveGlobalMatches]);
   
   // Refs
   const initialLoadedRef = useRef(false);
@@ -66,6 +112,7 @@ export default function HomePage() {
   const { setComplianceText } = useCompliance();
   const chatIdRef = useRef<string | null>(chatIdParam || null);
   const creatingChatRef = useRef(false);
+  const userInteractedRef = useRef(false);
 
   useEffect(() => {
     chatIdRef.current = chatId;
@@ -363,8 +410,8 @@ export default function HomePage() {
       setMsgOffset(0);
       setHasMoreMessages(true);
       initialLoadedRef.current = false;
+      // Keep right pane open when switching chats
       setMatchesOpen(false);
-      setShowRight(false);
       
       // Reset scroll position for next load
       setTimeout(() => {
@@ -454,10 +501,10 @@ export default function HomePage() {
 
   // Toggle showing products in the right pane
   const handleToggleProducts = useCallback(async () => {
-    // If already open, close it
+    // If already open, close the list but keep the right pane visible
     if (matchesOpen) {
       setMatchesOpen(false);
-      setShowRight(false);
+      setShowRight(true);
       return;
     }
     
@@ -466,9 +513,9 @@ export default function HomePage() {
       setShowRight(true);
       setMatchesOpen(true);
       
-      // Always fetch the most recent matches for this chat
+      // Always fetch the most recent matches; persist as global
       console.log("Fetching latest matches for chat");
-      const allMatchesResult = await fetchChatMatches(chatId!, '', getRegion());
+      const allMatchesResult = await fetchChatMatches(chatId!, '');
       const arr = (allMatchesResult && Array.isArray(allMatchesResult.chat_matches))
         ? allMatchesResult.chat_matches
         : [];
@@ -499,6 +546,11 @@ export default function HomePage() {
         }
         setMatches(items);
         setAsOf(latest.as_of || null);
+        setGlobalMatches(items);
+        setGlobalAsOf(latest.as_of || null);
+        // Persist as global across chats
+        setGlobalMatches(items);
+        setGlobalAsOf(latest.as_of || null);
       } else {
         console.warn('No matches available for this chat');
       }
@@ -513,34 +565,56 @@ export default function HomePage() {
   useEffect(() => {
     let cancelled = false;
     const checkMatches = async () => {
-      if (!chatId) { setHasMatchesInChat(false); return; }
+      if (!chatId) { setHasMatchesInChat(!!globalMatches.length); return; }
       try {
-        const res = await fetchChatMatches(chatId, '', getRegion());
+        const res = await fetchChatMatches(chatId, '');
         if (!cancelled) {
           const hasAny = Array.isArray(res?.chat_matches) && res.chat_matches.length > 0;
-          setHasMatchesInChat(hasAny);
+          setHasMatchesInChat(hasAny || !!globalMatches.length);
+          if (hasAny) {
+            // Use the latest matches from this chat and persist globally
+            const arr = [...res.chat_matches].sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+            const latest = arr[0];
+            let items: any = latest?.items;
+            if (typeof items === 'string') {
+              try { items = JSON.parse(items); } catch { items = []; }
+            }
+            if (!Array.isArray(items) && items && typeof items === 'object') {
+              if (Array.isArray(items.recommendations)) items = items.recommendations;
+              else if (Array.isArray(items.results)) items = items.results;
+              else if (Array.isArray(items.items)) items = items.items;
+            }
+            if (Array.isArray(items)) {
+              setMatches(items);
+              setAsOf((latest as any)?.as_of || null);
+              updateGlobalMatches(items, (latest as any)?.as_of || null);
+            }
+            return;
+          }
+          // If no matches found for this chat but we have global, keep panel populated
+          if ((!hasAny || !res?.chat_matches?.length) && globalMatches.length) {
+            setMatches(globalMatches);
+            setAsOf(globalAsOf);
+          }
         }
       } catch {
-        if (!cancelled) setHasMatchesInChat(false);
+        if (!cancelled) setHasMatchesInChat(!!globalMatches.length);
       }
     };
     checkMatches();
     return () => { cancelled = true; };
   }, [chatId]);
 
-  // On desktop only, open both panels by default
+  // On desktop only, keep right pane open by default
   useEffect(() => {
     try {
       if (typeof window === 'undefined' || !window.matchMedia) return;
-      const isDesktop = window.matchMedia('(min-width: 1024px)').matches; // Tailwind lg breakpoint
+      const isDesktop = window.matchMedia('(min-width: 1024px)').matches; // Tailwind lg
       if (!isDesktop) return;
-      if (!showSidebar) setShowSidebar(true);
-      if (!showRight) setShowRight(true);
-      if (hasMatchesInChat && !matchesOpen) {
-        handleToggleProducts();
-      }
+      if (!showSidebar && !userInteractedRef.current) setShowSidebar(true);
+      setShowRight(true);
     } catch {}
-  }, [chatId, hasMatchesInChat, matchesOpen, showSidebar, showRight, handleToggleProducts]);
+  }, [chatId]);
 
   // Handle user message submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -621,7 +695,9 @@ export default function HomePage() {
               return b64;
             }
           };
+          let gotFirstDelta = false;
           const onProgress = (e: MessageEvent) => {
+            if (gotFirstDelta) return; // hide progress once first token arrives
             try {
               const data = JSON.parse(e.data || '{}');
               const now = Date.now();
@@ -639,6 +715,11 @@ export default function HomePage() {
             const raw = (e.data || '') as string;
             const chunk = decodeB64Utf8(raw);
             if (chunk) {
+              if (!gotFirstDelta) {
+                gotFirstDelta = true;
+                setProgressText(undefined);
+                setTyping(false);
+              }
               acc += chunk;
               const assistantMsg: ChatMessage = {
                 key: liveKey,
@@ -753,7 +834,7 @@ export default function HomePage() {
               const summaryCardMsgs = mappedMessages.filter(m => m.kind === 'summary_card');
               if (summaryCardMsgs.length > 0) {
                 try {
-                  const summaryCards = await fetchChatSummaryCards(ensuredChatId!, getRegion());
+                  const summaryCards = await fetchChatSummaryCards(ensuredChatId!);
                   if (summaryCards.chat_summary_cards && summaryCards.chat_summary_cards.length > 0) {
                     const cardDataMap = new Map();
                     summaryCards.chat_summary_cards.forEach(card => {
@@ -771,7 +852,7 @@ export default function HomePage() {
               try {
                 const matchesMsgs = mappedMessages.filter(m => m.kind === 'matches');
                 if (matchesMsgs.length > 0) {
-                  const allMatchesResult = await fetchChatMatches(ensuredChatId!, '', getRegion());
+                  const allMatchesResult = await fetchChatMatches(ensuredChatId!, '');
                   if (allMatchesResult.chat_matches && allMatchesResult.chat_matches.length > 0) {
                     const latest = allMatchesResult.chat_matches.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0];
                     let itemsLatest: any = latest.items;
@@ -786,6 +867,11 @@ export default function HomePage() {
                           seen = true;
                         }
                       }
+                      // Update right pane immediately and persist globally
+              setMatches(itemsLatest);
+              setAsOf((latest as any)?.as_of || null);
+              updateGlobalMatches(itemsLatest, (latest as any)?.as_of || null);
+                      setShowRight(true);
                     }
                   }
                 }
@@ -833,13 +919,13 @@ export default function HomePage() {
       
       // Auto-open right pane for matches if assistant requested it
       try {
-        const paneType = (response as any)?.right_pane?.pane || (response as any)?.right_pane?.type;
+        const paneType = (acc as any)?.right_pane?.pane || (acc as any)?.right_pane?.type;
         if (paneType === 'matches') {
           setShowRight(true);
           setMatchesOpen(true);
           setLoadingRecs(true);
           try {
-            const allMatchesResult = await fetchChatMatches(ensuredChatId!, '', getRegion());
+            const allMatchesResult = await fetchChatMatches(ensuredChatId!, '');
             const arr = Array.isArray(allMatchesResult?.chat_matches) ? allMatchesResult.chat_matches : [];
             arr.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
             const latest = arr[0];
@@ -898,7 +984,7 @@ export default function HomePage() {
       const summaryCardMsgs = mappedMessages.filter(m => m.kind === 'summary_card');
       if (summaryCardMsgs.length > 0) {
         try {
-          const summaryCards = await fetchChatSummaryCards(ensuredChatId!, getRegion());
+          const summaryCards = await fetchChatSummaryCards(ensuredChatId!);
           if (summaryCards.chat_summary_cards && summaryCards.chat_summary_cards.length > 0) {
             // Create a map of id -> data
             const cardDataMap = new Map();
@@ -927,7 +1013,7 @@ export default function HomePage() {
       try {
         const matchesMsgs = mappedMessages.filter(m => m.kind === 'matches');
         if (matchesMsgs.length > 0) {
-          const allMatchesResult = await fetchChatMatches(ensuredChatId!, '', getRegion());
+          const allMatchesResult = await fetchChatMatches(ensuredChatId!, '');
           if (allMatchesResult.chat_matches && allMatchesResult.chat_matches.length > 0) {
             const latest = allMatchesResult.chat_matches.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0];
             let itemsLatest: any = latest.items;
@@ -1041,6 +1127,23 @@ export default function HomePage() {
       return;
     }
         
+        // Prime right pane from persisted global matches, if any
+        try {
+          const persisted = loadGlobalMatchesFromStorage();
+          if (persisted && Array.isArray(persisted.items) && persisted.items.length > 0) {
+            setGlobalMatches(persisted.items);
+            setMatches(persisted.items);
+            setGlobalAsOf(persisted.as_of || null);
+            setAsOf(persisted.as_of || null);
+            // Open on desktop only; keep closed on mobile
+            try {
+              if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(min-width: 1024px)').matches) {
+                setShowRight(true);
+              }
+            } catch {}
+          }
+        } catch {}
+
         // If no chats exist, create a new one
         if ((!chatIdParam || chatsArray.length === 0) && !chatId) {
           console.log("Creating new chat");
@@ -1192,7 +1295,7 @@ export default function HomePage() {
         if (summaryCardMsgs.length > 0) {
           try {
             console.log("Loading summary cards for chat:", chatId);
-            const summaryCards = await fetchChatSummaryCards(chatId, getRegion());
+            const summaryCards = await fetchChatSummaryCards(chatId);
             console.log("Summary cards loaded:", summaryCards);
             
             if (summaryCards.chat_summary_cards && summaryCards.chat_summary_cards.length > 0) {
@@ -1223,7 +1326,7 @@ export default function HomePage() {
         try {
           const matchesMsgs = mappedMessages.filter(m => m.kind === 'matches');
           if (matchesMsgs.length > 0) {
-            const allMatchesResult = await fetchChatMatches(chatId, '', getRegion());
+            const allMatchesResult = await fetchChatMatches(chatId, '');
             if (allMatchesResult.chat_matches && allMatchesResult.chat_matches.length > 0) {
               const latest = allMatchesResult.chat_matches.sort((a: any, b: any) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())[0];
               let itemsLatest: any = latest.items;
@@ -1295,6 +1398,7 @@ export default function HomePage() {
 
   // Toggle sidebar visibility
   const toggleSidebar = useCallback(() => {
+    userInteractedRef.current = true;
     setShowSidebar(prev => !prev);
   }, []);
 
@@ -1367,11 +1471,11 @@ export default function HomePage() {
           </div>
                 </div>
             
-            {hasMatchesInChat && (
+            {(hasMatchesInChat || globalMatches.length > 0) && (
               <button
                 type="button"
                 onClick={handleToggleProducts}
-                className="px-2 py-1 rounded-md bg-[#c19658]/80 hover:bg-[#c19658] text-black text-xs transition-colors flex items-center gap-1"
+                className="px-2 py-1 rounded-md bg-[#c19658]/80 hover:bg-[#c19658] text-black text-xs transition-colors flex items-center gap-1 md:hidden"
               >
                 {matchesOpen ? 'Hide Products List' : 'Show Products List'}
                 {matchesOpen ? (
@@ -1433,8 +1537,8 @@ export default function HomePage() {
             summary={summary}
             selected={selected}
             loadingRecs={loadingRecs}
-            matches={matches}
-            asOf={asOf}
+            matches={globalMatches.length ? globalMatches : matches}
+            asOf={globalAsOf || asOf}
             onShowScoreInfo={() => {}}
             onAskAboutProduct={(symbol, name) => {
               console.log("onAskAboutProduct called with:", symbol, name);

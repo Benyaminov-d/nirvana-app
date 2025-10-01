@@ -132,22 +132,16 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
       })}
 
         {/* Typing indicator moved here to be displayed as the last message */}
+        
         {typing && (
           <div className="flex justify-start mt-4">
             {progressText ? (
-              <div className="min-h-[40px] flex items-center text-sm text-white/80" data-testid="progress-indicator">
-                <span className="mr-2">{progressText}</span>
-                <span className="typing flex items-center">
-                  <span className="dot dot-1"></span>
-                  <span className="dot dot-2"></span>
-                  <span className="dot dot-3"></span>
-                </span>
+              <div className="min-h-[40px] flex items-center text-md font-medium text-white/80" data-testid="progress-indicator">
+                <span className="thinking-wave">{progressText}</span>
               </div>
             ) : (
-              <div className="typing min-h-[40px] flex items-center" data-testid="typing-indicator">
-                <span className="dot dot-1"></span>
-                <span className="dot dot-2"></span>
-                <span className="dot dot-3"></span>
+              <div className="typing-single min-h-[40px] flex items-center" data-testid="typing-indicator">
+                <span className="single-dot"></span>
               </div>
             )}
           </div>

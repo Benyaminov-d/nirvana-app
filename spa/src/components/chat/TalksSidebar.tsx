@@ -1,5 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import type { ChatSummary } from '../../services/api';
 
 function stripMarkdown(input: string): string {
@@ -145,16 +147,91 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
     return `${dd}.${mm}.${yyyy}`;
   };
 
+  const UserMenuDropup: React.FC<{ onAction?: () => void }> = ({ onAction }) => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const [open, setOpen] = React.useState(false);
+    const ref = React.useRef<HTMLDivElement | null>(null);
+
+    const displayName = React.useMemo(() => {
+      if (user) {
+        const nameParts = [user.first_name, user.last_name].filter(Boolean).join(' ').trim();
+        return nameParts || user.email;
+      }
+      return 'Account';
+    }, [user]);
+
+    React.useEffect(() => {
+      const handle = (e: MouseEvent) => {
+        if (!ref.current) return;
+        if (!ref.current.contains(e.target as Node)) setOpen(false);
+      };
+      document.addEventListener('click', handle);
+      return () => document.removeEventListener('click', handle);
+    }, []);
+
+    const goAccount = () => {
+      setOpen(false);
+      navigate('/account');
+      if (onAction) onAction();
+    };
+
+    const goLogout = () => {
+      setOpen(false);
+      navigate('/logout');
+      if (onAction) onAction();
+    };
+
+    return (
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="w-full px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-200 flex items-center justify-between"
+          aria-haspopup="menu"
+          aria-expanded={open}
+        >
+          <span className="truncate text-sm">{displayName}</span>
+          <span className="ml-2 text-xs">{open ? '▲' : '▼'}</span>
+        </button>
+        {open && (
+          <div
+            role="menu"
+            className="absolute bottom-full left-0 right-0 mb-2 glass nv-glass--inner-hairline border border-white/10 rounded-lg overflow-hidden shadow-xl z-10 bg-[#212121]"
+          >
+            <button
+              type="button"
+              onClick={goAccount}
+              className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-white/10"
+              role="menuitem"
+            >
+              Account
+            </button>
+            <div className="h-px bg-white/10" />
+            <button
+              type="button"
+              onClick={goLogout}
+              className="w-full text-left px-3 py-2 text-sm text-red-300 hover:bg-white/10"
+              role="menuitem"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       {/* Desktop sidebar */}
-      <div className={`${open ? 'hidden md:flex' : 'hidden'} md:flex-col md:w-64 glass nv-glass--inner-hairline border border-white/10 rounded-2xl p-2 m-2 md:h-[calc(100dvh-1rem)] md:overflow-hidden`}>
+      <div className={`${open ? 'hidden md:flex' : 'hidden'} md:flex-col md:w-64 glass nv-glass--inner-hairline !bg-[#212121] border border-white/10 rounded-2xl p-2 m-2 md:h-[calc(100dvh-1rem)] md:overflow-hidden`}>
         <div className="flex items-center justify-between mb-4">
           <div className="text-lg font-medium text-white trajan-text">Sessions</div>
           <button 
             type="button" 
             onClick={onCreate} 
-            className="px-4 py-1.5 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-black font-medium transition-colors" 
+            className="px-3 py-1 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-sm text-black font-medium transition-colors" 
             aria-label="New session"
           >
             New
@@ -192,6 +269,9 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
             </button>
           ))}
         </div>
+        <div className="pt-2 border-t border-white/10">
+          <UserMenuDropup />
+        </div>
       </div>
 
       {/* Mobile drawer */}
@@ -201,7 +281,7 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
           <button 
             type="button" 
             onClick={onCreate} 
-            className="px-4 py-1.5 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-black font-medium transition-colors" 
+            className="px-3 py-1 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-sm text-black font-medium transition-colors" 
             aria-label="New session"
           >
             New
@@ -241,6 +321,9 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
               </div>
             </button>
           ))}
+        </div>
+        <div className="pt-2 border-t border-white/10">
+          <UserMenuDropup onAction={onClose} />
         </div>
       </MobileDrawerLeft>
     </>
