@@ -1490,9 +1490,9 @@ export default function HomePage() {
           onClose={() => setShowSidebar(false)}
         />
 
-        {/* Center wrapper to keep Chat + Right pane centered on desktop */}
-        <div className="flex-1 overflow-hidden flex md:justify-center">
-          <div className="flex items-stretch w-full">
+        {/* Center wrapper to keep Chat + Right pane centered */}
+        <div className="flex-1 overflow-hidden flex justify-center">
+          <div className="flex items-stretch w-full md:w-auto justify-center">
             {/* Middle: Chat Messages */}
             <div className="relative w-full max-w-[50rem] md:min-w-[48rem] flex-shrink-0 h-[100svh] md:h-auto flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
               <div className="flex items-center justify-between mb-4 absolute top-0 left-0 h-[60px] w-full p-4 z-10 backdrop-blur-md">
