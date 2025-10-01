@@ -1485,135 +1485,132 @@ export default function HomePage() {
           onClose={() => setShowSidebar(false)}
         />
 
-        {/* Middle: Chat Messages */}
-        <div className="relative max-w-[50rem] mx-auto h-[100svh] md:h-auto flex-1 flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
-          <div className="flex items-center justify-between mb-4 absolute top-0 left-0 h-[60px] w-full p-4 z-10 backdrop-blur-md">
-            <div className="flex items-center">
-              <button
-                type="button"
-                onClick={toggleSidebar}
-                className="mr-3 w-6 h-6 flex items-center justify-center rounded-full bg-[#c19658]/80 hover:bg-[#c19658] text-black transition-colors text-xs"
-                aria-label={showSidebar ? "Hide Products" : "Show sidebar"}
-              >
-                {showSidebar ? "←" : "→"}
-              </button>
-              <div className="flex gap-2 items-start">
-                <p className="text-white !text-4xl trajan-text trajan-text">Proximity</p>
-                <p className="text-white text-md trajan-text relative right-1 bottom-1">Search</p>
-            <div className="relative right-2 bottom-2 mb-0 ml-0">
-              <button
-                type="button"
-                aria-label="What's this?"
-                          onMouseEnter={() => setShowTip(true)}
-                          onMouseLeave={() => setShowTip(false)}
-                          onFocus={() => setShowTip(true)}
-                          onBlur={() => setShowTip(false)}
-                          onClick={() => setShowTip((v) => !v)}
-                className="w-3 h-3 inline-flex items-center justify-center rounded-full border border-white/40 text-white/80 hover:text-white hover:border-white text-[8px]"
-                title="What's this?"
-              >
-                i
-              </button>
-              {showTip && (
-                <div className="text-[12px] absolute top-full left-1/2 -translate-x-1/2 mt-2 z-10 text-gray-300 bg-black/40 border border-white/10 rounded-md p-2 w-fit whitespace-nowrap">
-                  Nirvana's search engine
+        {/* Center wrapper to keep Chat + Right pane centered on desktop */}
+        <div className="flex-1 overflow-hidden flex justify-center">
+          <div className="flex items-stretch">
+            {/* Middle: Chat Messages */}
+            <div className="relative max-w-[50rem] md:min-w-[48rem] flex-shrink-0 h-[100svh] md:h-auto flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
+              <div className="flex items-center justify-between mb-4 absolute top-0 left-0 h-[60px] w-full p-4 z-10 backdrop-blur-md">
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    onClick={toggleSidebar}
+                    className="mr-3 w-6 h-6 flex items-center justify-center rounded-full bg-[#c19658]/80 hover:bg-[#c19658] text-black transition-colors text-xs"
+                    aria-label={showSidebar ? "Hide Products" : "Show sidebar"}
+                  >
+                    {showSidebar ? "←" : "→"}
+                  </button>
+                  <div className="flex gap-2 items-start">
+                    <p className="text-white !text-4xl trajan-text trajan-text">Proximity</p>
+                    <p className="text-white text-md trajan-text relative right-1 bottom-1">Search</p>
+                    <div className="relative right-2 bottom-2 mb-0 ml-0">
+                      <button
+                        type="button"
+                        aria-label="What's this?"
+                        onMouseEnter={() => setShowTip(true)}
+                        onMouseLeave={() => setShowTip(false)}
+                        onFocus={() => setShowTip(true)}
+                        onBlur={() => setShowTip(false)}
+                        onClick={() => setShowTip((v) => !v)}
+                        className="w-3 h-3 inline-flex items-center justify-center rounded-full border border-white/40 text-white/80 hover:text-white hover:border-white text-[8px]"
+                        title="What's this?"
+                      >
+                        i
+                      </button>
+                      {showTip && (
+                        <div className="text-[12px] absolute top-full left-1/2 -translate-x-1/2 mt-2 z-10 text-gray-300 bg-black/40 border border-white/10 rounded-md p-2 w-fit whitespace-nowrap">
+                          Nirvana's search engine
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
-                </div>
-            
-            {(hasMatchesInChat || globalMatches.length > 0) && (
-              <button
-                type="button"
-                onClick={handleToggleProducts}
-                className="px-2 py-1 rounded-md bg-[#c19658]/80 hover:bg-[#c19658] text-black text-xs transition-colors flex items-center gap-1 md:hidden"
-              >
-                {matchesOpen ? 'Hide Products List' : 'Show Products List'}
-                {matchesOpen ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 12H5"></path>
-                    <path d="M12 19l-7-7 7-7"></path>
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14"></path>
-                    <path d="M12 5l7 7-7 7"></path>
-                  </svg>
+
+                {(hasMatchesInChat || globalMatches.length > 0) && (
+                  <button
+                    type="button"
+                    onClick={handleToggleProducts}
+                    className="px-2 py-1 rounded-md bg-[#c19658]/80 hover:bg-[#c19658] text-black text-xs transition-colors flex items-center gap-1 md:hidden"
+                  >
+                    {matchesOpen ? 'Hide Products List' : 'Show Products List'}
+                    {matchesOpen ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 12H5"></path>
+                        <path d="M12 19l-7-7 7-7"></path>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14"></path>
+                        <path d="M12 5l7 7-7 7"></path>
+                      </svg>
+                    )}
+                  </button>
                 )}
-              </button>
-            )}
+              </div>
+
+              <ChatFeed
+                ref={chatFeedRef}
+                messages={messages}
+                matchesOpen={matchesOpen}
+                onToggleProducts={handleToggleProducts}
+                loadingMore={loadingMore}
+                hydrating={loading}
+                typing={typing}
+                progressText={progressText}
+                onTopReached={handleLoadMore}
+                onScrollPositionChange={({ atBottom }) => { stickToBottomRef.current = atBottom; }}
+                bottomInset={keyboardInset}
+              />
+
+              <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }}>
+                <form onSubmit={handleSubmit} className="flex items-center gap-3 border border-white/20 rounded-xl glass nv-glass--inner-hairline p-1">
+                  <div className="px-4 py-3 flex-1 relative">
+                    <input 
+                      ref={inputRef} 
+                      type="text" 
+                      placeholder="Say anything.." 
+                      className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 leading-none" 
+                      disabled={locked} 
+                    />
+                  </div>
+                  <button
+                    type="submit" 
+                    disabled={locked} 
+                    className="h-[40px] px-5 mr-1 bg-[#c19658] rounded-xl text-black hover:bg-[#d1a668] transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <span className="text-sm">Enter</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Right: Details or Matches (kept mounted to avoid unmount resets) */}
+            <RightPane
+              showRight={showRight}
+              loadingSummary={loadingSummary}
+              summary={summary}
+              selected={selected}
+              loadingRecs={loadingRecs}
+              matches={globalMatches.length ? globalMatches : matches}
+              asOf={globalAsOf || asOf}
+              onShowScoreInfo={() => {}}
+              onAskAboutProduct={(symbol, name) => {
+                console.log("onAskAboutProduct called with:", symbol, name);
+                if (inputRef.current) {
+                  inputRef.current.value = `Tell me more about product: ${symbol}`;
+                  const syntheticEvent = {
+                    preventDefault: () => {},
+                    target: { checkValidity: () => true }
+                  };
+                  console.log("Submitting form with:", inputRef.current.value);
+                  handleSubmit(syntheticEvent as any);
+                }
+              }}
+              onClose={() => { setShowRight(false); setMatchesOpen(false); }}
+            />
+          </div>
         </div>
-
-          <ChatFeed
-            ref={chatFeedRef}
-            messages={messages}
-            matchesOpen={matchesOpen}
-            onToggleProducts={handleToggleProducts}
-            loadingMore={loadingMore}
-            hydrating={loading}
-            typing={typing}
-            progressText={progressText}
-            onTopReached={handleLoadMore}
-            onScrollPositionChange={({ atBottom }) => { stickToBottomRef.current = atBottom; }}
-            bottomInset={keyboardInset}
-          />
-          
-
-          <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }}>
-            <form onSubmit={handleSubmit} className="flex items-center gap-3 border border-white/20 rounded-xl glass nv-glass--inner-hairline p-1">
-              <div className="px-4 py-3 flex-1 relative">
-                <input 
-                  ref={inputRef} 
-                  type="text" 
-                  placeholder="Say anything.." 
-                  className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 leading-none" 
-                  disabled={locked} 
-                />
-                {/* Typing indicator in the bottom right corner */}
-                {/* Typing indicator removed from here - now handled in ChatFeed component */}
-              </div>
-              <button
-                type="submit" 
-                disabled={locked} 
-                className="h-[40px] px-5 mr-1 bg-[#c19658] rounded-xl text-black hover:bg-[#d1a668] transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <span className="text-sm">Enter</span>
-              </button>
-            </form>
-              </div>
-              </div>
-
-        {/* Right: Details or Matches (kept mounted to avoid unmount resets) */}
-          <RightPane
-            showRight={showRight}
-            loadingSummary={loadingSummary}
-            summary={summary}
-            selected={selected}
-            loadingRecs={loadingRecs}
-            matches={globalMatches.length ? globalMatches : matches}
-            asOf={globalAsOf || asOf}
-            onShowScoreInfo={() => {}}
-            onAskAboutProduct={(symbol, name) => {
-              console.log("onAskAboutProduct called with:", symbol, name);
-              // Set the input value and submit the form
-              if (inputRef.current) {
-                inputRef.current.value = `Tell me more about product: ${symbol}`;
-                // inputRef.current.value = `Tell me more about product: ${name} (${symbol})`;
-                
-                // Create a synthetic event that more closely resembles a real submit event
-                const syntheticEvent = {
-                  preventDefault: () => {},
-                  target: { checkValidity: () => true }
-                };
-                
-                console.log("Submitting form with:", inputRef.current.value);
-                handleSubmit(syntheticEvent as any);
-              }
-            }}
-            onClose={() => { setShowRight(false); setMatchesOpen(false); }}
-          />
-        </div>
+      </div>
     </div>
   );
 }

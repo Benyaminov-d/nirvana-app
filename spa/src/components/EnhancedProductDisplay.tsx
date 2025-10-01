@@ -253,7 +253,8 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
       }
       return date.toLocaleDateString('en-US', { 
         month: 'short', 
-        day: 'numeric'
+        day: 'numeric',
+        year: 'numeric'
       });
     } catch {
       return dateStr;
@@ -278,71 +279,11 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
           </div>
         </div>
         
-        {/* Time period selector */}
-        <div className="flex flex-col items-end gap-2 ml-4">
-          <div className="flex gap-2">
-            {TIME_PERIODS.map(period => (
-              <button
-                key={period.value}
-                onClick={() => setSelectedPeriod(period.value)}
-                className={`px-3 py-1 rounded text-sm transition-colors ${
-                  selectedPeriod === period.value
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                }`}
-              >
-                {period.label}
-              </button>
-            ))}
-          </div>
-          {/* Price range */}
-          {chartData.length > 0 && (
-            <div className="text-sm text-gray-400">
-              {getCurrencySymbol(quote?.currency)}{Math.min(...chartData.map(d => d.price)).toFixed(2)} - {getCurrencySymbol(quote?.currency)}{Math.max(...chartData.map(d => d.price)).toFixed(2)}
-            </div>
-          )}
-        </div>
-      </div>
         
-      {quote && !loadingQuote && (
-          <div className="mt-4">
-            <div className="text-4xl font-bold mb-2">
-              {formatPrice(displayPrice || quote.current_price, quote.currency)}
-            </div>
-            
-            {displayDate && (
-              <div className="text-sm text-gray-400 mb-2">
-                {displayDate}
-              </div>
-            )}
-            
-            {!hoverPoint && changeInfo && (
-              <div className={`text-sm ${changeInfo.isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                {changeInfo.display} Today
-              </div>
-            )}
-            
-            {!hoverPoint && quote.after_hours_price && (
-              <div className="text-sm text-gray-400 mt-1">
-                {formatPrice(quote.after_hours_price, quote.currency)} {quote.after_hours_change ? (
-                  <span className={quote.after_hours_change >= 0 ? 'text-green-400' : 'text-red-400'}>
-                    {quote.after_hours_change >= 0 ? '+' : ''}{formatPrice(quote.after_hours_change, quote.currency)} 
-                    ({quote.after_hours_change_percent?.toFixed(2)}%)
-                  </span>
-                ) : ''} After Hours
-              </div>
-            )}
-            
-            {!hoverPoint && quote.last_updated && (
-              <div className="text-xs text-gray-500 mt-1">
-                {new Date(parseInt(quote.last_updated) * 1000).toLocaleTimeString()}
-              </div>
-            )}
-          </div>
-        )}
-
-      {/* CVaR Loss Levels – moved near header area */}
-      <div className="mt-4 mb-4">
+      </div>
+      
+      {/* CVaR Loss Levels – moved above price */}
+      <div className="mt-2 mb-4">
         <div className="flex items-center gap-2 text-gray-200 mb-2">
           <div className="font-medium">Expected loss levels</div>
           <button 
@@ -381,6 +322,72 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
           <div className="text-xs text-gray-400">CVaR data not available</div>
         )}
       </div>
+
+      {quote && !loadingQuote && (
+          <div className="mt-4 flex justify-between items-start gap-4">
+            <div className="flex-1">
+              <div className="text-4xl font-bold mb-2">
+                {formatPrice(displayPrice || quote.current_price, quote.currency)}
+              </div>
+              
+              {displayDate && (
+                <div className="text-sm text-gray-400 mb-2">
+                  {displayDate}
+                </div>
+              )}
+              
+              {!hoverPoint && changeInfo && (
+                <div className={`text-sm ${changeInfo.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                  {changeInfo.display} Today
+                </div>
+              )}
+              
+              {!hoverPoint && quote.after_hours_price && (
+                <div className="text-sm text-gray-400 mt-1">
+                  {formatPrice(quote.after_hours_price, quote.currency)} {quote.after_hours_change ? (
+                    <span className={quote.after_hours_change >= 0 ? 'text-green-400' : 'text-red-400'}>
+                      {quote.after_hours_change >= 0 ? '+' : ''}{formatPrice(quote.after_hours_change, quote.currency)} 
+                      ({quote.after_hours_change_percent?.toFixed(2)}%)
+                    </span>
+                  ) : ''} After Hours
+                </div>
+              )}
+              
+              {!hoverPoint && quote.last_updated && (
+                <div className="text-xs text-gray-500 mt-1">
+                  {new Date(parseInt(quote.last_updated) * 1000).toLocaleTimeString()}
+                </div>
+              )}
+            </div>
+
+            {/* Time period selector moved next to price */}
+            <div className="flex flex-col items-end gap-2 ml-4">
+              <div className="flex gap-2">
+                {TIME_PERIODS.map(period => (
+                  <button
+                    key={period.value}
+                    onClick={() => setSelectedPeriod(period.value)}
+                    className={`px-3 py-1 rounded text-sm transition-colors ${
+                      selectedPeriod === period.value
+                        ? 'bg-gray-700 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    {period.label}
+                  </button>
+                ))}
+              </div>
+              {/* Price range */}
+              {chartData.length > 0 && (
+                <div className="text-sm text-gray-400">
+                  {getCurrencySymbol(quote?.currency)}{Math.min(...chartData.map(d => d.price)).toFixed(2)} - {getCurrencySymbol(quote?.currency)}{Math.max(...chartData.map(d => d.price)).toFixed(2)}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+      
 
       {/* Stock details intro */}
       <div className="mb-4 text-gray-300">
