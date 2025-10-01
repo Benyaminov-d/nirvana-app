@@ -496,7 +496,7 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
             <tr>
               <td class="px" style="padding:24px 32px 8px 32px;">
                 <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#8b96a5; font-size:12px;">${sendTime}</div>
-                <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin-top:8px; font-weight:700; font-size:24px; line-height:30px; color:#ffffff;">Nirvana — Products & Scores</div>
+                <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin-top:8px; font-weight:700; font-size:24px; line-height:30px; color:#ffffff;">Nirvana - Products & Scores</div>
               </td>
             </tr>
             <tr>
@@ -504,9 +504,9 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#141821;border:1px solid #1f2530;border-radius:12px;">
                   <tr>
                     <td style="padding:24px 24px 8px 24px;">
-                      <div class="h1" style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-size:24px; line-height:32px; color:#ffffff; font-weight:700;">${displayName}, your personalized shortlist is ready</div>
+                      <div class="h1" style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; font-size:24px; line-height:32px; color:#ffffff; font-weight:700;">${displayName}, Proximity Search results are ready</div>
                       <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#c6ccd6; font-size:14px; line-height:22px; margin-top:8px;">
-                        We include only instruments that pass <strong>Nirvana Standard</strong> and order them by <strong>Compass Score</strong> (0–10,000), where downside safety (CVaR) carries more weight than expected return. The attached PDF has details for each instrument.
+                        Your Proximity Search results are ready. Please find them attached and summarized in the table below.
                       </div>
                     </td>
                   </tr>
