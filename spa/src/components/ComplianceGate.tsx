@@ -37,15 +37,16 @@ export default function ComplianceGate() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-      <div className="relative glass nv-glass--inner-hairline border border-white/10 bg-black/60 rounded-2xl max-w-lg w-full p-6 text-white max-h-[85vh] overflow-y-auto">
+      <div className="absolute inset-0 backdrop-blur-sm" style={{ background: 'var(--colour-overlay)' }} />
+      <div className="relative glass nv-glass--inner-hairline rounded-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto" style={{ border: 'var(--effect-glass-border-1px)', background: 'var(--colour-surface)', color: 'var(--colour-text-primary)' }}>
         <h2 className="text-xl font-semibold trajan-text mb-3 text-center">Only Nirvana</h2>
         {/* <p className="text-md font-semibold trajan-text mb-3 text-center">Neutral search engine for financial products - search, not advice. No pay-to-rank. No commissions. Information only; not advice or a recommendation.</p> */}
-        <p className="text-sm text-gray-300 mb-4 text-center">Please select your country or region and accept the Member EULA to proceed.</p>
+        <p className="text-sm mb-4 text-center" style={{ color: 'var(--colour-text-secondary)' }}>Please select your country or region and accept the Member EULA to proceed.</p>
 
         <label className="text-sm block mb-3">Country or Region
           <select
-            className="mt-1 w-full bg-[#2d2d2d] border border-gray-600 rounded px-3 py-2"
+            className="mt-1 w-full rounded px-3 py-2"
+            style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
             value={state.region || ''}
             onChange={(e) => setRegion((e.target.value || 'OTHER') as Region)}
           >
@@ -56,14 +57,15 @@ export default function ComplianceGate() {
           </select>
         </label>
 
-        <label className="text-sm flex items-start gap-2 mb-4">
+        <label className="text-sm flex items-start gap-2 mb-4" style={{ color: 'var(--colour-text-primary)' }}>
           <input type="checkbox" className="mt-1" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
-          <span>I accept the <a href="https://nirvana.bm/member-eula" target="_blank" className="underline text-gray-200 hover:text-white" rel="noopener noreferrer">Member EULA</a> and understand that search results are information only and are not advice or a recommendation.</span>
+          <span>I accept the <a href="https://nirvana.bm/member-eula" target="_blank" className="underline" style={{ color: 'var(--colour-text-primary)' }} rel="noopener noreferrer">Member EULA</a> and understand that search results are information only and are not advice or a recommendation.</span>
         </label>
 
         <button
           type="button"
-          className="w-full bg-[#c19658] text-black rounded-xl py-2.5 font-semibold disabled:opacity-60 disabled:cursor-not-allowed hover:opacity-90"
+          className="w-full rounded-xl py-2.5 font-semibold disabled:opacity-60 disabled:cursor-not-allowed hover:opacity-90"
+          style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
           disabled={disabled}
           onClick={accept}
         >
@@ -73,12 +75,13 @@ export default function ComplianceGate() {
           <img
             src={eulaImageUrl}
             alt="Member EULA"
-            className="mx-auto w-full rounded-lg border border-white/10 object-contain"
+            className="mx-auto w-full rounded-lg object-contain"
+            style={{ border: 'var(--effect-glass-border-1px)' }}
             loading="lazy"
             // onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
         </div>
-        <p className="text-[11px] text-gray-400 mt-3 text-center">This dialog cannot be dismissed until completed.</p>
+        <p className="text-[11px] mt-3 text-center" style={{ color: 'var(--colour-text-muted)' }}>This dialog cannot be dismissed until completed.</p>
       </div>
     </div>
   );

@@ -42,12 +42,12 @@ export default function CookieBanner() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[90] p-3">
-      <div className="glass nv-glass--inner-hairline border border-white/10 bg-black/70 text-white rounded-xl max-w-3xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:gap-4">
+      <div className="glass nv-glass--inner-hairline rounded-xl max-w-3xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:gap-4" style={{ border: 'var(--effect-glass-border-1px)', background: 'var(--colour-overlay)', color: 'var(--colour-text-primary)' }}>
         <div className="text-sm flex-1">
-          We use cookies to improve your experience, analyze traffic, and for security. By clicking “Accept”, you consent to the use of cookies as described in our <a href="/terms" className="underline hover:text-white">Public Terms of Use</a>.
+          We use cookies to improve your experience, analyze traffic, and for security. By clicking “Accept”, you consent to the use of cookies as described in our <a href="/terms" className="underline" style={{ color: 'var(--colour-text-primary)' }}>Public Terms of Use</a>.
         </div>
         <div className="mt-2 md:mt-0 flex gap-2">
-          <button onClick={accept} className="bg-[#c19658] text-black rounded-lg px-4 py-2 text-sm hover:opacity-90">Accept</button>
+          <button onClick={accept} className="rounded-lg px-4 py-2 text-sm hover:opacity-90" style={{ background: 'var(--colour-standard-pass)', color: '#000' }}>Accept</button>
         </div>
       </div>
     </div>

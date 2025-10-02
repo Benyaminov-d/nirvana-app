@@ -31,43 +31,44 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
   const sign = isPositive ? '+' : '';
 
   return (
-    <div className="bg-[#0b0b0b] p-6 rounded-lg w-full">
+    <div className="p-6 rounded-lg w-full" style={{ background: 'var(--colour-surface)' }}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
-          <p className="text-white !text-3xl trajan-text">Proximity</p>
-          <p className="text-white !text-md trajan-text relative right-1 bottom-1">Search</p>
+          <p className="!text-3xl trajan-text" style={{ color: 'var(--colour-text-primary)' }}>Proximity</p>
+          <p className="!text-md trajan-text relative right-1 bottom-1" style={{ color: 'var(--colour-text-primary)' }}>Search</p>
           <button 
             type="button" 
-            className="w-4 h-4 inline-flex items-center justify-center rounded-full border border-white/50 text-white/80 text-[10px] ml-1 hover:bg-white/10 transition-colors duration-200"
+            className="w-4 h-4 inline-flex items-center justify-center rounded-full text-[10px] ml-1 transition-colors duration-200"
+            style={{ border: '1px solid var(--colour-glass-border)', color: 'var(--colour-text-primary)' }}
             title="Applies the Nirvana standard to compute a search relevance score for each product"
           >?</button>
         </div>
         
         <div className="flex gap-2">
-          <button className="px-3 py-1 rounded text-sm bg-gray-700 text-white">1Y</button>
-          <button className="px-3 py-1 rounded text-sm bg-gray-800 text-gray-400 hover:bg-gray-700">5Y</button>
-          <button className="px-3 py-1 rounded text-sm bg-gray-800 text-gray-400 hover:bg-gray-700">MAX</button>
+          <button className="px-3 py-1 rounded text-sm" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}>1Y</button>
+          <button className="px-3 py-1 rounded text-sm" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-secondary)', border: 'var(--effect-glass-border-1px)' }}>5Y</button>
+          <button className="px-3 py-1 rounded text-sm" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-secondary)', border: 'var(--effect-glass-border-1px)' }}>MAX</button>
         </div>
       </div>
       
-      <h1 className="text-xl font-bold mb-4 text-white">
+      <h1 className="text-xl font-bold mb-4" style={{ color: 'var(--colour-text-primary)' }}>
         {name} ({symbol})
         {country && currency && (
-          <span className="ml-2 px-2 py-0.5 bg-gray-800 rounded text-xs text-gray-300">
+          <span className="ml-2 px-2 py-0.5 rounded text-xs" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-secondary)' }}>
             {country} · {currency}
           </span>
         )}
       </h1>
       
-      <div className="text-sm text-gray-400 mb-4">
+      <div className="text-sm mb-4" style={{ color: 'var(--colour-text-muted)' }}>
         {currencySymbol}{priceRange.min.toFixed(2)} - {currencySymbol}{priceRange.max.toFixed(2)}
       </div>
       
-      <div className="text-4xl font-bold mb-2 text-white">
+      <div className="text-4xl font-bold mb-2" style={{ color: 'var(--colour-text-primary)' }}>
         {currencySymbol}{currentPrice.toFixed(2)}
       </div>
       
-      <div className={`text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+      <div className={`text-sm`} style={{ color: isPositive ? 'var(--colour-success)' : 'var(--colour-error)' }}>
         {sign}{currencySymbol}{Math.abs(change).toFixed(2)} ({sign}{changePercent.toFixed(2)}%) Today
       </div>
     </div>

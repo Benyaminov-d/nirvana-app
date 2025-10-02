@@ -8,7 +8,9 @@
 @font-face { font-family: 'TrajanPro'; src: url('../assets/fonts/trajan-pro/TrajanPro-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'TrajanPro'; src: url('../assets/fonts/trajan-pro/TrajanPro-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
 
-:root { color-scheme: dark; }
+/* color-scheme is controlled dynamically by ThemeProvider */
+/* Defaults to light for accessibility and contrast */
+:root { color-scheme: light; }
 
 /* Fixed background layer that works on all devices including iOS */
 body::before {
@@ -18,8 +20,9 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #111;
-  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../assets/bg.JPG');
+  /* Light theme: plain white background */
+  background-color: #ffffff;
+  background-image: none;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -32,6 +35,12 @@ body {
   position: relative;
   font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
+}
+
+/* Dark theme background overlay adjustments */
+body.nv-dark::before {
+  background-color: #111;
+  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../assets/bg.JPG');
 }
 
 /* Ensure main content is above the background */
@@ -61,12 +70,17 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
 
 /* Liquid glass */
 .glass { 
-  background: var(--colour-glass-bg);
-  border: var(--effect-glass-border-1px);
+  /* background: var(--colour-glass-bg); */
+  /* border: 1px solid var(--colour-glass-border); */
   -webkit-backdrop-filter: var(--effect-glass-backdrop);
   backdrop-filter: var(--effect-glass-backdrop);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  box-shadow: 0px 4px 4px 0px var(--tw-shadow-color,var(--shadow-color-1,#0000000a)),0px 0px 1px 0px var(--tw-shadow-color,var(--shadow-color-2,#0000009e));
+  /* box-shadow: 0 10px 30px rgba(0,0,0,0.25); */
   border-radius: var(--effect-glass-radius);
+}
+/* Light theme: stronger white glass background */
+body:not(.nv-dark) .glass {
+  /* background: rgb(255 255 255 / 60%); */
 }
 .nv-no-backdrop {
   background: transparent !important;
@@ -84,19 +98,21 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
 .chat-bubble { 
   position: relative; 
   display: inline-block; 
-  padding: 10px 14px; 
-  border-radius: 14px; 
-  background: var(--colour-glass-bg); 
-  border: var(--effect-glass-border-1px); 
-  -webkit-backdrop-filter: var(--effect-glass-backdrop); 
-  backdrop-filter: var(--effect-glass-backdrop); 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
+  font-family: ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;
+  font-weight: 300;
+  /* padding: 10px 14px;  */
+  border-radius: 9999px; 
+  background: var(--colour-bubble-user-bg); 
+  border: none; 
+  -webkit-backdrop-filter: none; 
+  backdrop-filter: none; 
+  box-shadow: none; 
   overflow: visible; 
 }
 .chat-bubble--assistant {
   /* Stronger matte glass for assistant messages */
   background: rgba(0, 0, 0, 0.35);
-  border: var(--effect-glass-border-1px);
+  border: 1px solid var(--colour-glass-border);
   -webkit-backdrop-filter: var(--effect-glass-backdrop);
   backdrop-filter: var(--effect-glass-backdrop);
 }
@@ -114,15 +130,33 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
 }
 .chat-bubble--right::after { 
   content: ""; rotate: 180deg; position: absolute; right: calc(var(--tail-inset) + 1px); bottom: calc(-1 * var(--tail-h) + 1px); 
-  width: calc(var(--tail-w) - 2px); height: calc(var(--tail-h) - 2px); background: var(--colour-glass-bg); 
+  width: calc(var(--tail-w) - 2px); height: calc(var(--tail-h) - 2px); background: var(--colour-bubble-user-bg); 
   clip-path: polygon(50% 50%, 100% 100%, 0 100%); 
   -webkit-backdrop-filter: var(--effect-glass-backdrop);
   backdrop-filter: var(--effect-glass-backdrop);
 }
 
+/* Remove bubble tails entirely */
+.chat-bubble--right::before,
+.chat-bubble--right::after {
+  content: none;
+  display: none;
+}
+
 /* Chat animations */
 .fade-in-up { opacity: 0; transform: translateY(8px); animation: chatIn 300ms ease forwards; }
 @keyframes chatIn { to { opacity: 1; transform: translateY(0); } }
+
+/* Assistant text typography */
+.prose {
+  font-size: 1rem;
+  line-height: 1.75;
+  font-family: ui-sans-serif,-apple-system,system-ui,Segoe UI,Helvetica,Apple Color Emoji,Arial,sans-serif,Segoe UI Emoji,Segoe UI Symbol;
+  font-weight: 300;
+}
+
+/* KaTeX base styles via CDN to render math blocks inline with Markdown */
+@import url("https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css");
 
 /* Typing dots */
 .typing { display:inline-flex; align-items:center; gap:6px; padding: 8px 12px; }
@@ -140,12 +174,12 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
 .typing .dot-3 { animation: typing-dot-3 1.4s infinite ease-in-out; }
 
 /* Single pulsing dot (used while awaiting first progress event) */
-.typing-single { display:inline-flex; align-items:center; padding: 8px 12px; }
+.typing-single { display:inline-flex; align-items:center; }
 .typing-single .single-dot {
   width: 16px;
   height: 16px;
   border-radius: 9999px;
-  background: #d1d5db;
+  background: #2c2c2c;
   animation: single-pulse 2s ease-in-out infinite;
   box-shadow: 0 0 0 0 rgba(209,213,219,0.5);
 }
@@ -158,7 +192,7 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
 /* Animated thinking text: subtle left-to-right sheen through the text */
 .thinking-wave {
   position: relative;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.4) 0%, #ffffff 50%, rgba(255,255,255,0.4) 100%);
+  background: linear-gradient(90deg, rgb(224, 224, 224) 0%, #383838 50%, rgb(224, 224, 224) 100%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -222,7 +256,7 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
 @keyframes blink { 0%, 80%, 100% { opacity:.2; } 40% { opacity:1; } }
 
 /* Simple spinner */
-.spinner { width: 14px; height: 14px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.35); border-top-color: rgba(255,255,255,0.9); animation: sp 0.8s linear infinite; display:inline-block; }
+.spinner { width: 14px; height: 14px; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.35); border-top-color: rgba(64, 64, 64, 0.9); animation: sp 0.8s linear infinite; display:inline-block; }
 @keyframes sp { to { transform: rotate(360deg);} }
 
 
@@ -246,12 +280,12 @@ html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
   backdrop-filter: blur(20px);
   transition: all 0.3s ease;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); */
 }
 
 .weather-widget:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  /* box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3); */
 }
 
 .weather-widget .text-3xl {

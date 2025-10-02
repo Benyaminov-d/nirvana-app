@@ -32,9 +32,10 @@ const MobileDrawerRight: React.FC<{ open: boolean; onClose?: () => void; childre
 
   return createPortal(
     <div className="fixed inset-0 z-[60] md:hidden" onClick={handleBackdropClick}>
-      <div className={`absolute inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity duration-300 ${animOpen ? 'opacity-100' : 'opacity-0'}`} />
+      <div className={`absolute inset-0 backdrop-blur-[2px] transition-opacity duration-300 ${animOpen ? 'opacity-100' : 'opacity-0'}`} style={{ background: 'var(--colour-overlay)' }} />
       <div 
-        className={`absolute inset-y-0 right-0 w-[90vw] max-w-[380px] bg-black/90 border-l border-white/10 p-4 shadow-2xl h-full overflow-auto transform-gpu will-change-transform transform transition-transform duration-300 ease-in-out ${animOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`absolute inset-y-0 right-0 w-[90vw] max-w-[380px] p-4 shadow-2xl h-full overflow-auto transform-gpu will-change-transform transform transition-transform duration-300 ease-in-out ${animOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ background: 'var(--colour-bg-black)', borderLeft: '1px solid var(--colour-glass-border)' }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -47,9 +48,9 @@ const MobileDrawerRight: React.FC<{ open: boolean; onClose?: () => void; childre
 };
 
 export const LossCell: React.FC<{ title: string; value: string }> = ({ title, value }) => (
-  <div className="bg-black/30 border border-white/10 rounded-md p-3 text-gray-200 h-full flex flex-col">
-    <div className="text-xs text-gray-400 flex-1 min-h-[2.5rem] flex items-start">{title}</div>
-    <div className={`text-lg ${value === '…' ? 'text-gray-400 animate-pulse' : 'text-red-400'}`}>{value}</div>
+  <div className="rounded-md p-3 h-full flex flex-col" style={{ background: 'var(--colour-surface)', border: 'var(--effect-glass-border-1px)', color: 'var(--colour-text-primary)' }}>
+    <div className="text-xs flex-1 min-h-[2.5rem] flex items-start" style={{ color: 'var(--colour-text-secondary)' }}>{title}</div>
+    <div className={`text-lg ${value === '…' ? '' : ''}`} style={{ color: value === '…' ? 'var(--colour-text-muted)' : 'var(--colour-error)' }}>{value}</div>
   </div>
 );
 
@@ -241,15 +242,15 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
   
   const renderContent = () => (
     <>
-      {loadingSummary && (<div className="text-gray-300 text-sm">Loading…</div>)}
+      {loadingSummary && (<div className="text-sm" style={{ color: 'var(--colour-text-secondary)' }}>Loading…</div>)}
       {summary && selected && !loadingSummary && (
         <div>
           <ProductHeaderWrapper symbol={selected.symbol} summary={summary} />
           <EnhancedProductDisplay symbol={selected.symbol} />
           <div className="mt-6">
-            <div className="flex items-center gap-2 text-gray-200">
+            <div className="flex items-center gap-2" style={{ color: 'var(--colour-text-primary)' }}>
               <div className="font-medium">Expected loss levels</div>
-              <button type="button" aria-label="What is this?" title="Expected loss in a down year, Expected loss across 1 in 20 worst years (95-CVaR), Expected loss across 1 in 100 worst years (99-CVaR)" className="w-4 h-4 inline-flex items-center justify-center rounded-full border border-white/50 text-white/80 text-[10px]">?</button>
+              <button type="button" aria-label="What is this?" title="Expected loss in a down year, Expected loss across 1 in 20 worst years (95-CVaR), Expected loss across 1 in 100 worst years (99-CVaR)" className="w-4 h-4 inline-flex items-center justify-center rounded-full text-[10px]" style={{ border: '1px solid var(--colour-glass-border)', color: 'var(--colour-text-primary)' }}>?</button>
             </div>
             {summary?.loss_levels?.message ? (
               <div className="text-amber-400 text-sm mt-2 p-3 bg-amber-500/10 rounded border border-amber-500/20">{summary.loss_levels.message}</div>
@@ -260,27 +261,27 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                 <LossCell title="Expected loss across 1 in 100 worst years (99-CVaR)" value={formatNegPct(summary?.loss_levels?.one_in_100?.cvar99_pct ?? null)} />
               </div>
             )}
-            {loadingSummary && <div className="text-xs text-gray-400 mt-2">Loading loss levels…</div>}
+            {loadingSummary && <div className="text-xs mt-2" style={{ color: 'var(--colour-text-muted)' }}>Loading loss levels…</div>}
           </div>
         </div>
       )}
 
       {!summary && !loadingRecs && matches.length === 0 && (
         <div>
-          <div className="grid grid-cols-2 text-[11px] uppercase tracking-wider text-gray-400 mb-3">
+          <div className="grid grid-cols-2 text-[11px] uppercase tracking-wider mb-3" style={{ color: 'var(--colour-text-muted)' }}>
             <div>
               <div>Search results</div>
-              <div className="text-gray-300 normal-case tracking-normal mt-1" style={{ color: '#ff7f50' }}>No AI used in search</div>
+              <div className="normal-case tracking-normal mt-1" style={{ color: 'var(--colour-warning)' }}>No AI used in search</div>
             </div>
             <div className="text-right justify-self-end">Search relevance index (Compass Score)</div>
           </div>
           <div className="space-y-3 mt-4 mb-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white/5 rounded-lg p-4 border border-white/5 shadow-sm">
+              <div key={i} className="rounded-lg p-4 shadow-sm" style={{ background: 'var(--colour-surface)', border: 'var(--effect-glass-border-1px)' }}>
                 <div className="flex justify-between items-center">
                   <div>
-                    <div className="text-sm text-gray-100/40 font-medium blur-[6px] select-none">AAA{i + 1}</div>
-                    <div className="text-xs text-gray-400/50 truncate max-w-[220px] mt-1 blur-[6px] select-none">Product Name Placeholder</div>
+                    <div className="text-sm font-medium blur-[6px] select-none" style={{ color: 'var(--colour-text-muted)' }}>AAA{i + 1}</div>
+                    <div className="text-xs truncate max-w-[220px] mt-1 blur-[6px] select-none" style={{ color: 'var(--colour-text-secondary)' }}>Product Name Placeholder</div>
                   </div>
                   <div className="w-20 h-4 bg-blue-700/50 rounded ml-4 blur-[6px]" />
                 </div>
@@ -290,18 +291,44 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
         </div>
       )}
 
+
       {!summary && matches.length > 0 && !loadingRecs && (
         <div>
-          <div className="grid grid-cols-2 text-[11px] uppercase tracking-wider text-gray-400 mb-3">
+          <div className="flex gap-2 items-start mb-4">
+            <p className="!text-2xl trajan-text trajan-text nv-text-primary">Proximity</p>
+            <p className="text-md trajan-text relative right-1 bottom-1 nv-text-primary">Search</p>
+            <div className="relative right-2 bottom-2 mb-0 ml-0">
+              {/* <button
+                type="button"
+                aria-label="What's this?"
+                onMouseEnter={() => setShowTip(true)}
+                onMouseLeave={() => setShowTip(false)}
+                onFocus={() => setShowTip(true)}
+                onBlur={() => setShowTip(false)}
+                onClick={() => setShowTip((v) => !v)}
+                className="w-3 h-3 inline-flex items-center justify-center rounded-full text-[8px]"
+                style={{ border: '1px solid var(--colour-glass-border)', color: 'var(--colour-text-primary)' }}
+              >
+                i
+              </button>
+              {showTip && (
+                <div className="text-[12px] absolute top-full left-1/2 -translate-x-1/2 mt-2 z-10 rounded-md p-2 w-fit whitespace-nowrap" style={{ color: 'var(--colour-text-primary)', background: 'var(--colour-surface)', border: '1px solid var(--colour-glass-border)', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+                  Nirvana's search engine
+                </div>
+              )} */}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 text-[11px] uppercase tracking-wider mb-3" style={{ color: 'var(--colour-text-muted)' }}>
             <div>
               <div>Search results</div>
-              <div className="text-gray-300 normal-case tracking-normal mt-1" style={{ color: '#ff7f50' }}>No AI used in search</div>
+              <div className="normal-case tracking-normal mt-1" style={{ color: 'var(--colour-warning)' }}>No AI used in search</div>
             </div>
             <div className="text-right justify-self-end">Search relevance ranking (Compass Score)</div>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <div className="text-xs text-gray-400">{asOf || ''}</div>
-            <label className="flex items-center gap-2 text-gray-200"><input type="checkbox" checked={showReturns} onChange={(e)=> setShowReturns(e.target.checked)} aria-label="Show returns toggle" /><span>Show returns</span></label>
+            <div className="text-xs" style={{ color: 'var(--colour-text-muted)' }}>{asOf || ''}</div>
+            <label className="flex items-center gap-2" style={{ color: 'var(--colour-text-primary)' }}><input type="checkbox" checked={showReturns} onChange={(e)=> setShowReturns(e.target.checked)} aria-label="Show returns toggle" /><span>Show returns</span></label>
           </div>
           
           {/* Display products list */}
@@ -309,7 +336,8 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
             {matches.map((item, index) => (
               <div 
                 key={`${item.symbol}-${index}`} 
-                className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors border border-white/5 hover:border-white/10 shadow-sm cursor-pointer product-item"
+                className="rounded-lg p-4 transition-colors shadow-sm cursor-pointer product-item"
+                style={{ background: 'var(--colour-surface)', border: 'var(--effect-glass-border-1px)' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   console.log("Product clicked:", item.symbol);
@@ -323,10 +351,10 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="text-sm text-gray-100 font-medium">{item.symbol}</div>
-                    <div className="text-xs text-gray-400 truncate max-w-[200px] mt-1">{item.name}</div>
+                    <div className="text-sm font-medium" style={{ color: 'var(--colour-text-primary)' }}>{item.symbol}</div>
+                    <div className="text-xs truncate max-w-[200px] mt-1" style={{ color: 'var(--colour-text-secondary)' }}>{item.name}</div>
                     {showReturns && item.annualized_return && (
-                      <div className="text-xs text-green-400 mt-2 bg-green-900/20 px-2 py-1 rounded-md inline-block">
+                      <div className="text-xs mt-2 px-2 py-1 rounded-md inline-block" style={{ color: 'var(--colour-success)', background: 'rgba(34,195,166,0.15)' }}>
                         {typeof item.annualized_return === 'object' ? 
                           `Return: ${item.annualized_return.value_pct}%` : 
                           `Return: ${(item.annualized_return * 100).toFixed(2)}%`}
@@ -341,11 +369,11 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
             ))}
           </div>
           
-          <div className="mt-3"><button type="button" className="underline underline-offset-2 text-gray-200 hover:text-white" onClick={onShowScoreInfo}>How this score works?</button></div>
+          {/* <div className="mt-3"><button type="button" className="underline underline-offset-2" style={{ color: 'var(--colour-text-primary)' }} onClick={onShowScoreInfo}>How this score works?</button></div> */}
         </div>
       )}
 
-      {loadingRecs && (<div className="text-gray-300 text-sm">Loading…</div>)}
+      {loadingRecs && (<div className="text-sm" style={{ color: 'var(--colour-text-secondary)' }}>Loading…</div>)}
       
       {/* Product tooltip */}
       {tooltipProduct && createPortal(
@@ -359,13 +387,14 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="bg-black/80 backdrop-blur-md rounded-lg p-4 shadow-xl border border-white/20 min-w-[250px] product-tooltip-content">
-            <div className="text-lg font-medium text-white mb-1">{tooltipProduct.symbol}</div>
-            <div className="text-sm text-gray-300 mb-3">{tooltipProduct.name}</div>
+          <div className="rounded-lg p-4 shadow-xl min-w-[250px] product-tooltip-content" style={{ background: 'var(--colour-surface)', border: '1px solid var(--colour-glass-border)', color: 'var(--colour-text-primary)' }}>
+            <div className="text-lg font-medium mb-1" style={{ color: 'var(--colour-text-primary)' }}>{tooltipProduct.symbol}</div>
+            <div className="text-sm mb-3" style={{ color: 'var(--colour-text-secondary)' }}>{tooltipProduct.name}</div>
             
             <button
               onClick={handleAskAbout}
-              className="w-full bg-[#c19658] hover:bg-[#d1a668] text-black py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -375,7 +404,7 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
               Ask Satya
             </button>
             
-            <div className="w-0 h-0 border-l-[8px] border-l-transparent border-t-[8px] border-t-black/80 border-r-[8px] border-r-transparent absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full"></div>
+            <div className="w-0 h-0 border-l-[8px] border-l-transparent border-t-[8px] border-r-[8px] border-r-transparent absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full" style={{ borderTopColor: 'var(--colour-surface)' }}></div>
           </div>
         </div>,
         document.body
@@ -386,11 +415,11 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
   return (
     <>
       {/* Desktop panel */}
-      <div className={`${showRight ? 'hidden md:block' : 'hidden'} md:w-80 flex-shrink-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl p-4 m-2 md:h-[calc(100dvh-1rem)] md:overflow-auto shadow-lg relative`}>
+      <div className={`${showRight ? 'hidden md:block' : 'hidden'} md:w-80 flex-shrink-0 p-4 m-0 md:h-[100dvh] md:overflow-auto relative`} style={{ background: 'var(--colour-panel-bg)', borderLeft: '1px solid var(--colour-panel-border)' }}>
         {renderContent()}
         {/* Bottom fixed actions - visible when there are products */}
         {matches && matches.length > 0 && (
-          <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent z-10">
+          <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 py-2 z-10" style={{ background: 'var(--colour-surface)' }}>
             <div className="w-full flex items-center justify-between gap-2">
               <button
                 type="button"
@@ -413,7 +442,8 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                     setBusy(false);
                   }
                 }}
-                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+                className="px-3 py-1 rounded text-sm font-medium"
+                style={{ border: '1px solid var(--colour-standard-pass)', color: '#000' }}
               >
                 Download PDF
               </button>
@@ -421,7 +451,8 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                 type="button"
                 disabled={busy}
                 onClick={() => setShowEmailModal(true)}
-                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+                className="px-3 py-1 rounded text-sm font-medium"
+                style={{ border: '1px solid var(--colour-standard-pass)', color: '#000' }}
               >
                 Send by Email
               </button>
@@ -433,22 +464,22 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
       {/* Send by Email modal */}
       {showEmailModal && createPortal(
         <div className="fixed inset-0 z-[80] flex items-end md:items-center justify-center">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowEmailModal(false)} />
-          <div className="relative w-full md:w-[520px] bg-[#181818] border border-white/10 rounded-t-2xl md:rounded-2xl p-4 md:p-6 m-0 md:m-4">
-            <div className="text-lg font-medium text-white mb-4">Send by Email</div>
+          <div className="absolute inset-0" onClick={() => setShowEmailModal(false)} style={{ background: 'var(--colour-overlay)' }} />
+          <div className="relative w-[95vw] max-w-[640px] md:w-[560px] rounded-t-2xl md:rounded-2xl p-4 md:p-6 m-0 md:m-4" style={{ background: 'var(--colour-bg-black)', border: 'var(--effect-glass-border-1px)' }}>
+            <div className="text-lg font-medium mb-4" style={{ color: 'var(--colour-text-primary)' }}>Send by Email</div>
             <div className="space-y-3">
               <div>
-                <div className="text-xs text-gray-400 mb-1">Recipient</div>
-                <input value={user?.email || ''} disabled className="w-full bg-white/5 text-white px-3 py-2 rounded border border-white/10 disabled:opacity-60" />
+                <div className="text-xs mb-1" style={{ color: 'var(--colour-text-muted)' }}>Recipient</div>
+                <input value={user?.email || ''} disabled className="w-full px-3 py-2 rounded disabled:opacity-60" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }} />
               </div>
               <div>
-                <div className="text-xs text-gray-400 mb-1">CC (comma-separated)</div>
-                <textarea value={ccText} onChange={(e)=> setCcText(e.target.value)} placeholder="name1@example.com, name2@example.com" className="w-full min-h-[80px] bg-white/5 text-white px-3 py-2 rounded border border-white/10 disabled:opacity-60" disabled={busy} />
+                <div className="text-xs mb-1" style={{ color: 'var(--colour-text-muted)' }}>CC (comma-separated)</div>
+                <textarea value={ccText} onChange={(e)=> setCcText(e.target.value)} placeholder="name1@example.com, name2@example.com" className="w-full min-h-[80px] px-3 py-2 rounded disabled:opacity-60" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }} disabled={busy} />
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-2">
-              <button type="button" className="px-3 py-2 rounded bg-white/10 text-gray-200 border border-white/20 disabled:opacity-60" onClick={()=> setShowEmailModal(false)} disabled={busy}>Cancel</button>
-              <button type="button" className="px-4 py-2 rounded bg-[#c19658] text-black font-medium disabled:opacity-60" disabled={busy} onClick={async ()=>{
+              <button type="button" className="px-3 py-2 rounded disabled:opacity-60" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }} onClick={()=> setShowEmailModal(false)} disabled={busy}>Cancel</button>
+              <button type="button" className="px-4 py-2 rounded font-medium disabled:opacity-60" style={{ background: 'var(--colour-standard-pass)', color: '#000' }} disabled={busy} onClick={async ()=>{
                 if (!matches || matches.length === 0) { setShowEmailModal(false); return; }
                 try {
                   setBusy(true);
@@ -591,7 +622,7 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
       <MobileDrawerRight open={showRight} onClose={onClose}>
         {renderContent()}
         {matches && matches.length > 0 && (
-          <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent z-10 md:hidden">
+          <div className="sticky bottom-0 left-0 right-0 -mx-4 px-4 py-2 z-10 md:hidden">
             <div className="w-full flex items-center justify-between gap-2">
               <button
                 type="button"
@@ -621,7 +652,8 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                     setBusy(false);
                   }
                 }}
-                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+                className="px-3 py-1 rounded text-sm font-medium"
+                style={{ background: 'white', border: '1px solid var(--colour-standard-pass)', color: '#000' }}
               >
                 Download PDF
               </button>
@@ -629,7 +661,8 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
                 type="button"
                 disabled={busy}
                 onClick={() => setShowEmailModal(true)}
-                className="text-gray-200 hover:text-white px-2 py-1 rounded border border-white/20 bg-white/5 text-sm"
+                className="px-3 py-1 rounded text-sm font-medium"
+                style={{ background: 'white', border: '1px solid var(--colour-standard-pass)', color: '#000' }}
               >
                 Send by Email
               </button>

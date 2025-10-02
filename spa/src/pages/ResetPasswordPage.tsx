@@ -62,13 +62,13 @@ export default function ResetPasswordPage() {
       <div className="py-6">
         {isTokenValid && !isSuccess ? (
           <>
-            <p className="text-gray-300 mb-6">
+            <p className="mb-6" style={{ color: 'var(--colour-text-secondary)' }}>
               Create a new password for your account.
             </p>
             
             <form onSubmit={submit} className="space-y-6">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor="password" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
                   New Password
                 </label>
                 <input
@@ -77,13 +77,14 @@ export default function ResetPasswordPage() {
                   placeholder="Enter new password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+                  className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+                  style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
                   required
                 />
               </div>
               
               <div>
-                <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor="confirm-password" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
                   Confirm New Password
                 </label>
                 <input
@@ -92,13 +93,14 @@ export default function ResetPasswordPage() {
                   placeholder="Confirm new password"
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+                  className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+                  style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
                   required
                 />
               </div>
 
               {status && !isSuccess && (
-                <div className="py-2 px-3 rounded-md bg-red-900/50 text-red-200">
+                <div className="py-2 px-3 rounded-md" style={{ background: 'rgba(214,69,69,0.15)', color: 'var(--colour-error)' }}>
                   {status}
                 </div>
               )}
@@ -123,13 +125,13 @@ export default function ResetPasswordPage() {
           </>
         ) : isSuccess ? (
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-green-900/30">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full" style={{ background: 'rgba(34,195,166,0.15)' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" style={{ color: 'var(--colour-success)' }}>
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </div>
-            <h3 className="text-xl font-medium text-white mb-2">Password reset successful</h3>
-            <p className="text-gray-300 mb-6">
+            <h3 className="text-xl font-medium mb-2" style={{ color: 'var(--colour-text-primary)' }}>Password reset successful</h3>
+            <p className="mb-6" style={{ color: 'var(--colour-text-secondary)' }}>
               Your password has been reset successfully.
             </p>
             <Link 
@@ -141,13 +143,13 @@ export default function ResetPasswordPage() {
           </div>
         ) : (
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-red-900/30">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full" style={{ background: 'rgba(214,69,69,0.15)' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" style={{ color: 'var(--colour-error)' }}>
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
             </div>
-            <h3 className="text-xl font-medium text-white mb-2">Invalid reset link</h3>
-            <p className="text-gray-300 mb-6">
+            <h3 className="text-xl font-medium mb-2" style={{ color: 'var(--colour-text-primary)' }}>Invalid reset link</h3>
+            <p className="mb-6" style={{ color: 'var(--colour-text-secondary)' }}>
               {status || 'The password reset link is invalid or has expired.'}
             </p>
             <Link 
@@ -160,9 +162,9 @@ export default function ResetPasswordPage() {
         )}
 
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm" style={{ color: 'var(--colour-text-muted)' }}>
             Remember your password?{' '}
-            <Link to="/signin" className="text-blue-400 hover:text-blue-300 transition duration-200">
+            <Link to="/signin" className="transition duration-200" style={{ color: '#3b82f6' }}>
               Sign in
             </Link>
           </p>

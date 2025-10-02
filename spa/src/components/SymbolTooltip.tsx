@@ -48,47 +48,50 @@ export default function SymbolTooltip({ symbol, name, onClose, onAskInChat }: Sy
   
   if (!isVisible) {
     return (
-      <div className="tooltip-fade-out absolute z-50 bg-gray-900 border border-white/20 rounded-lg px-4 py-3 shadow-xl max-w-sm min-w-[280px]">
+      <div className="tooltip-fade-out absolute z-50 rounded-lg px-4 py-3 shadow-xl max-w-sm min-w-[280px]" style={{ background: 'var(--colour-overlay)', border: 'var(--effect-glass-border-1px)' }}>
         {/* Header with symbol and Ask in chat button */}
         <div className="flex items-start justify-between mb-2">
-          <div className="font-semibold text-white text-base">{symbol}</div>
+          <div className="font-semibold text-base" style={{ color: 'var(--colour-text-primary)' }}>{symbol}</div>
           {onAskInChat && (
             <button
               onClick={handleAskInChat}
-              className="ml-2 px-2 py-1 bg-[#c19658] hover:bg-[#d4a968] text-black text-xs font-medium rounded-md transition-colors duration-200 flex-shrink-0"
+              className="ml-2 px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200 flex-shrink-0"
+              style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
               title="Ask about this product in chat"
             >
               Ask in chat
             </button>
           )}
         </div>
-        <div className="text-gray-300 text-sm leading-relaxed">{name}</div>
-        <div className="absolute bottom-0 left-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900 translate-y-full"></div>
+        <div className="text-sm leading-relaxed" style={{ color: 'var(--colour-text-secondary)' }}>{name}</div>
+        <div className="absolute bottom-0 left-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent translate-y-full" style={{ borderTopColor: 'var(--colour-overlay)' }}></div>
       </div>
     );
   }
 
   return (
     <div 
-      className="tooltip-fade-in absolute z-50 bg-gray-900 border border-white/20 rounded-lg px-4 py-3 shadow-xl max-w-sm min-w-[280px]"
+      className="tooltip-fade-in absolute z-50 rounded-lg px-4 py-3 shadow-xl max-w-sm min-w-[280px]"
+      style={{ background: 'var(--colour-overlay)', border: 'var(--effect-glass-border-1px)' }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Header with symbol and Ask in chat button */}
       <div className="flex items-start justify-between mb-2">
-        <div className="font-semibold text-white text-base">{symbol}</div>
+        <div className="font-semibold text-base" style={{ color: 'var(--colour-text-primary)' }}>{symbol}</div>
         {onAskInChat && (
           <button
             onClick={handleAskInChat}
-            className="ml-2 px-2 py-1 bg-[#c19658] hover:bg-[#d4a968] text-black text-xs font-medium rounded-md transition-colors duration-200 flex-shrink-0"
+            className="ml-2 px-2 py-1 text-black text-xs font-medium rounded-md transition-colors duration-200 flex-shrink-0"
+            style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
             title="Ask about this product in chat"
           >
             Ask in chat
           </button>
         )}
       </div>
-      <div className="text-gray-300 text-sm leading-relaxed">{name}</div>
-      <div className="absolute bottom-0 left-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900 translate-y-full"></div>
+      <div className="text-sm leading-relaxed" style={{ color: 'var(--colour-text-secondary)' }}>{name}</div>
+      <div className="absolute bottom-0 left-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent translate-y-full" style={{ borderTopColor: 'var(--colour-overlay)' }}></div>
     </div>
   );
 }

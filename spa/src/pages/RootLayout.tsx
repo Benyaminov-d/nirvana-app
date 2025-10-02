@@ -3,6 +3,7 @@ import ComplianceGate from '../components/ComplianceGate';
 import CookieBanner from '../components/CookieBanner';
 import { useCompliance } from '../context/ComplianceContext';
 import { useEffect } from 'react';
+import ThemeToggle from '../components/ThemeToggle';
 import { AuthProvider } from '../context/AuthContext';
 
 export default function RootLayout() {
@@ -46,6 +47,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <div className="min-h-screen">
+        {/* <ThemeToggle /> */}
         {!isAuthRoute && <ComplianceGate />}
         {/* Top ribbons */}
         <div className="fixed top-0 left-0 right-0 z-10">

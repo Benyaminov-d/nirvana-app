@@ -53,7 +53,7 @@ function SimpleChart({ data, period, symbol, onHover, hoverX }: {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-1 bg-[#1a1a1a] rounded border border-gray-600 p-4 overflow-hidden">
+      <div className="flex-1 rounded border p-4 overflow-hidden">
         <div className="flex h-full">
           {/* Y-axis labels */}
           <div className="flex flex-col justify-between w-16 pr-2 text-xs text-gray-500 shrink-0">
@@ -117,8 +117,8 @@ function SimpleChart({ data, period, symbol, onHover, hoverX }: {
                     y1="0"
                     x2={hoverX}
                     y2="100"
-                    stroke="white"
-                    strokeWidth="0.3"
+                    stroke="gray"
+                    strokeWidth="0.1"
                     strokeDasharray="2,2"
                     opacity="0.7"
                   />
@@ -265,14 +265,14 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
   const displayDate = hoverPoint ? formatDisplayDate(hoverPoint.date) : null;
 
   return (
-    <div className="bg-[#1a1a1a] rounded-lg p-6 text-white">
+    <div className="rounded-lg border p-6 mb-8" style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)' }}>
       {/* Header with current quote */}
       <div className="mb-6 flex justify-between items-start">
         <div className="flex-1">
           <div className="text-xl font-bold mb-2">
             {loadingQuote ? 'Loading...' : `${quote?.name || symbol} (${quote?.symbol || symbol})`}
             {quote?.country && quote?.currency && (
-              <span className="ml-2 px-2 py-0.5 bg-gray-800 rounded text-xs text-gray-300">
+              <span className="ml-2 border px-2 py-0.5 rounded text-xs">
                 {quote.country} · {quote.currency}
               </span>
             )}
@@ -284,7 +284,7 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
       
       {/* CVaR Loss Levels – moved above price */}
       <div className="mt-2 mb-4">
-        <div className="flex items-center gap-2 text-gray-200 mb-2">
+        <div className="flex items-center gap-2 mb-2" style={{ color: 'var(--colour-text-primary)' }}>
           <div className="font-medium">Expected loss levels</div>
           <button 
             type="button" 
@@ -296,7 +296,7 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
           </button>
         </div>
         {loadingSummary ? (
-          <div className="text-xs text-gray-400">Loading loss levels...</div>
+          <div className="text-xs" style={{ color: 'var(--colour-text-muted)' }}>Loading loss levels...</div>
         ) : summary ? (
           summary?.loss_levels?.message ? (
             <div className="text-amber-400 text-sm mt-2 p-3 bg-amber-500/10 rounded border border-amber-500/20">
@@ -319,7 +319,7 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
             </div>
           )
         ) : (
-          <div className="text-xs text-gray-400">CVaR data not available</div>
+          <div className="text-xs" style={{ color: 'var(--colour-text-muted)' }}>CVaR data not available</div>
         )}
       </div>
 
@@ -331,21 +331,21 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
               </div>
               
               {displayDate && (
-                <div className="text-sm text-gray-400 mb-2">
+                <div className="text-sm mb-2" style={{ color: 'var(--colour-text-muted)' }}>
                   {displayDate}
                 </div>
               )}
               
               {!hoverPoint && changeInfo && (
-                <div className={`text-sm ${changeInfo.isPositive ? 'text-green-400' : 'text-red-400'}`}>
+                <div className={`text-sm`} style={{ color: changeInfo.isPositive ? 'var(--colour-success)' : 'var(--colour-error)' }}>
                   {changeInfo.display} Today
                 </div>
               )}
               
               {!hoverPoint && quote.after_hours_price && (
-                <div className="text-sm text-gray-400 mt-1">
+                <div className="text-sm mt-1" style={{ color: 'var(--colour-text-muted)' }}>
                   {formatPrice(quote.after_hours_price, quote.currency)} {quote.after_hours_change ? (
-                    <span className={quote.after_hours_change >= 0 ? 'text-green-400' : 'text-red-400'}>
+                    <span style={{ color: quote.after_hours_change >= 0 ? 'var(--colour-success)' : 'var(--colour-error)' }}>
                       {quote.after_hours_change >= 0 ? '+' : ''}{formatPrice(quote.after_hours_change, quote.currency)} 
                       ({quote.after_hours_change_percent?.toFixed(2)}%)
                     </span>
@@ -354,7 +354,7 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
               )}
               
               {!hoverPoint && quote.last_updated && (
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs mt-1" style={{ color: 'var(--colour-text-muted)' }}>
                   {new Date(parseInt(quote.last_updated) * 1000).toLocaleTimeString()}
                 </div>
               )}
@@ -367,11 +367,8 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
                   <button
                     key={period.value}
                     onClick={() => setSelectedPeriod(period.value)}
-                    className={`px-3 py-1 rounded text-sm transition-colors ${
-                      selectedPeriod === period.value
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
+                    className={`px-3 py-1 rounded text-sm transition-colors`}
+                    style={{ background: selectedPeriod === period.value ? 'var(--colour-standard-pass)' : 'var(--colour-surface)', color: selectedPeriod === period.value ? '#000' : 'var(--colour-text-secondary)', border: 'var(--effect-glass-border-1px)' }}
                   >
                     {period.label}
                   </button>
@@ -379,7 +376,7 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
               </div>
               {/* Price range */}
               {chartData.length > 0 && (
-                <div className="text-sm text-gray-400">
+                <div className="text-sm" style={{ color: 'var(--colour-text-muted)' }}>
                   {getCurrencySymbol(quote?.currency)}{Math.min(...chartData.map(d => d.price)).toFixed(2)} - {getCurrencySymbol(quote?.currency)}{Math.max(...chartData.map(d => d.price)).toFixed(2)}
                 </div>
               )}
@@ -390,7 +387,7 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
       
 
       {/* Stock details intro */}
-      <div className="mb-4 text-gray-300">
+      <div className="mb-4">
         Here is the latest {quote?.name || symbol} ({quote?.symbol || symbol}) stock details:
       </div>
 
@@ -418,10 +415,10 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
       </div>
 
       {/* Stock Analysis & Context */}
-      <div className="mb-6 space-y-4 text-sm text-gray-300 leading-relaxed">
+      <div className="mb-6 space-y-4 text-sm leading-relaxed" style={{ color: 'var(--colour-text-primary)' }}>
         <div>
-          <h3 className="text-lg font-semibold text-white mb-3">Overview & Market Context</h3>
-          <h4 className="text-md font-medium text-gray-200 mb-2">Stock Performance Today</h4>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--colour-text-primary)' }}>Overview & Market Context</h3>
+          <h4 className="text-md font-medium mb-2" style={{ color: 'var(--colour-text-primary)' }}>Stock Performance Today</h4>
           
           <div className="space-y-2">
             <div className="flex items-start space-x-2">
@@ -450,8 +447,8 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
           </div>
         </div>
         
-        <div className="pt-2 border-t border-gray-700">
-          <p className="text-gray-400">
+        <div className="pt-2" style={{ borderTop: 'var(--effect-glass-border-1px)' }}>
+          <p style={{ color: 'var(--colour-text-secondary)' }}>
             {quote?.name || symbol}'s {changeInfo?.isPositive ? 'positive' : 'negative'} momentum today {changeInfo?.isPositive ? 'continues to build on' : 'reflects challenges in'} recent market positioning. 
             Current technical indicators and trading patterns suggest {changeInfo?.isPositive ? 'sustained investor interest' : 'cautious market sentiment'} 
             as the company navigates evolving market conditions.
@@ -507,9 +504,9 @@ export default function EnhancedProductDisplay({ symbol }: { symbol: string }) {
 
 function LossCell({ title, value }: { title: string; value: string }) {
   return (
-    <div className="bg-black/30 border border-white/10 rounded-md p-3 text-gray-200 h-full flex flex-col">
-      <div className="text-xs text-gray-400 flex-1 min-h-[2.5rem] flex items-start">{title}</div>
-      <div className={`text-lg ${value === '—' || value === '…' ? 'text-gray-400 animate-pulse' : 'text-red-400'}`}>{value}</div>
+    <div className="rounded-md p-3 h-full flex flex-col" style={{ background: 'var(--colour-surface)', border: 'var(--effect-glass-border-1px)', color: 'var(--colour-text-primary)' }}>
+      <div className="text-xs flex-1 min-h-[2.5rem] flex items-start" style={{ color: 'var(--colour-text-secondary)' }}>{title}</div>
+      <div className={`text-lg ${value === '—' || value === '…' ? '' : ''}`} style={{ color: value === '—' || value === '…' ? 'var(--colour-text-muted)' : 'var(--colour-error)' }}>{value}</div>
     </div>
   );
 }

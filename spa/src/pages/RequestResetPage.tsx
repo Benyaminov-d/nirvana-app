@@ -37,13 +37,13 @@ export default function RequestResetPage() {
       <div className="py-6">
         {!isSuccess ? (
           <>
-            <p className="text-gray-300 mb-6">
+            <p className="mb-6" style={{ color: 'var(--colour-text-secondary)' }}>
               Enter your email address and we'll send you a link to reset your password.
             </p>
             
             <form onSubmit={submit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
                   Email Address
                 </label>
                 <input
@@ -52,13 +52,14 @@ export default function RequestResetPage() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+                  className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+                  style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
                   required
                 />
               </div>
 
               {status && (
-                <div className="py-2 px-3 rounded-md bg-red-900/50 text-red-200">
+                <div className="py-2 px-3 rounded-md" style={{ background: isSuccess ? 'rgba(34,195,166,0.15)' : 'rgba(214,69,69,0.15)', color: isSuccess ? 'var(--colour-success)' : 'var(--colour-error)' }}>
                   {status}
                 </div>
               )}
@@ -83,26 +84,26 @@ export default function RequestResetPage() {
           </>
         ) : (
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-green-900/30">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full" style={{ background: 'rgba(34,195,166,0.15)' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" style={{ color: 'var(--colour-success)' }}>
                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
               </svg>
             </div>
-            <h3 className="text-xl font-medium text-white mb-2">Check your email</h3>
-            <p className="text-gray-300 mb-6">
+            <h3 className="text-xl font-medium mb-2" style={{ color: 'var(--colour-text-primary)' }}>Check your email</h3>
+            <p className="mb-6" style={{ color: 'var(--colour-text-secondary)' }}>
               {status}
             </p>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-sm mb-4" style={{ color: 'var(--colour-text-muted)' }}>
               If you don't see the email, check your spam folder.
             </p>
           </div>
         )}
 
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm" style={{ color: 'var(--colour-text-muted)' }}>
             Remember your password?{' '}
-            <Link to="/signin" className="text-blue-400 hover:text-blue-300 transition duration-200">
+            <Link to="/signin" className="transition duration-200" style={{ color: '#3b82f6' }}>
               Sign in
             </Link>
           </p>

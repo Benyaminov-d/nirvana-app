@@ -43,25 +43,25 @@ export default function VerifyEmailPage() {
         {!isComplete && (
           <div className="flex items-center justify-center mb-4">
             <div className="spinner mr-3"></div>
-            <p className="text-white text-lg">{status}</p>
+            <p className="text-lg" style={{ color: 'var(--colour-text-primary)' }}>{status}</p>
           </div>
         )}
 
         {isComplete && (
           <>
             <div className="text-center mb-6">
-              <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full ${isSuccess ? 'bg-green-900/30' : 'bg-red-900/30'}`}>
+              <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full`} style={{ background: isSuccess ? 'rgba(34,195,166,0.15)' : 'rgba(214,69,69,0.15)' }}>
                 {isSuccess ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" style={{ color: 'var(--colour-success)' }}>
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 20 20" fill="currentColor" style={{ color: 'var(--colour-error)' }}>
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                 )}
               </div>
-              <p className="text-xl text-white">{status}</p>
+              <p className="text-xl" style={{ color: 'var(--colour-text-primary)' }}>{status}</p>
             </div>
 
             <div className="mt-8">
@@ -85,7 +85,7 @@ export default function VerifyEmailPage() {
         )}
 
         <div className="mt-8 text-center">
-          <Link to="/" className="text-blue-400 hover:text-blue-300 transition duration-200">
+          <Link to="/" className="transition duration-200" style={{ color: '#3b82f6' }}>
             Return to home page
           </Link>
         </div>

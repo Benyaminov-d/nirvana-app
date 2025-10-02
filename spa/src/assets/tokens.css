@@ -1,13 +1,14 @@
 :root {
-  /* Colour tokens */
-  --colour-bg-black: #0B0F14;
-  --colour-glass-bg: rgba(255,255,255,0.04);
-  --colour-glass-border: rgba(255,255,255,0.08);
-  --colour-glass-inner-highlight: rgba(255,255,255,0.06);
+  /* Colour tokens - LIGHT default */
+  --colour-bg-black: #ffffff;
+  --colour-glass-bg: rgba(0,0,0,0.04);
+  /* Subtle hairline border for light theme */
+  --colour-glass-border: #ECECEC;
+  --colour-glass-inner-highlight: rgba(255,255,255,0.30);
 
-  --colour-text-primary: #F5F7FB;
-  --colour-text-secondary: #AAB4C3;
-  --colour-text-muted: #7A8498;
+  --colour-text-primary: #111827; /* gray-900 */
+  --colour-text-secondary: #374151; /* gray-700 */
+  --colour-text-muted: #6B7280; /* gray-500 */
 
   --colour-score: #3A86FF;
   --colour-score-emphasis: #6FA8FF;
@@ -20,6 +21,20 @@
   --colour-success: #22C3A6;
   --colour-warning: #F2C14E;
   --colour-error: #D64545;
+
+  /* Surfaces */
+  --colour-surface: #ffffff;
+  --colour-overlay: rgba(0,0,0,0.60);
+
+  /* Panels (sidebars) */
+  --colour-panel-bg: #F9F9F9;
+  --colour-panel-border: #ECECEC;
+  --colour-panel-hover: #EFEFEF;
+  --colour-panel-active: #EAEAEA;
+
+  /* Chat bubble colours (light) */
+  --colour-bubble-user-bg: #F2F2F2;
+  --colour-bubble-user-text: #0A0A0A;
 
   /* Effects */
   --effect-glass-backdrop: blur(12px) saturate(110%);
@@ -42,12 +57,12 @@
 
 /* Glass card */
 .nv-glass {
-  background: var(--colour-glass-bg);
+  /* background: var(--colour-glass-bg); */
   border: var(--effect-glass-border-1px);
   -webkit-backdrop-filter: var(--effect-glass-backdrop);
   backdrop-filter: var(--effect-glass-backdrop);
   border-radius: var(--effect-glass-radius);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  /* box-shadow: 0 10px 30px rgba(0,0,0,0.25); */
 }
 .nv-glass--inner-hairline {
   box-shadow: var(--effect-glass-inner-top-hairline), 0 10px 30px rgba(0,0,0,0.25);
@@ -76,10 +91,32 @@
 .nv-text-secondary { color: var(--colour-text-secondary); }
 .nv-text-muted { color: var(--colour-text-muted); }
 
-/* Body background for dark glass theme */
+/* DARK overrides (activated by .nv-dark on body) */
 body.nv-dark {
-  color: var(--colour-text-primary);
-  background-color: var(--colour-bg-black);
+  /* Swap to dark token values */
+  --colour-bg-black: #0B0F14;
+  --colour-glass-bg: rgba(255,255,255,0.04);
+  /* Subtle hairline border for dark theme */
+  --colour-glass-border: rgba(255,255,255,0.12);
+  --colour-glass-inner-highlight: rgba(255,255,255,0.06);
+
+  --colour-text-primary: #F5F7FB;
+  --colour-text-secondary: #AAB4C3;
+  --colour-text-muted: #7A8498;
+
+  /* Surfaces */
+  --colour-surface: rgba(255,255,255,0.05);
+  --colour-overlay: rgba(0,0,0,0.70);
+
+  /* Panels (sidebars) */
+  --colour-panel-bg: #0B0F14;
+  --colour-panel-border: rgba(255,255,255,0.12);
+  --colour-panel-hover: rgba(255,255,255,0.06);
+  --colour-panel-active: rgba(255,255,255,0.08);
+
+  /* Chat bubble colours (dark) */
+  --colour-bubble-user-bg: rgba(255,255,255,0.08);
+  --colour-bubble-user-text: #F5F7FB;
 }
 
 /* Accessibility focus ring */

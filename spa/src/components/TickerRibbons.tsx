@@ -156,12 +156,12 @@ function Ribbon({ title, items, keyField, fontPx }: { title: string; items: Feed
       const sizeClass = fontPx >= 24 ? 'text-2xl' : fontPx >= 18 ? 'text-xl' : fontPx >= 16 ? 'text-lg' : 'text-sm';
       return (
         <span key={`${it.symbol}`} className={`inline-flex items-center gap-2 px-4 py-1 ${sizeClass}`} style={textStyle}>
-          <span className="text-white font-medium" style={textStyle}>
+          <span className="font-medium" style={{ ...textStyle, color: 'var(--colour-text-primary)' }}>
             {state.accepted ? it.symbol : (
               <Masked inline scramble blur>{it.symbol}</Masked>
             )}
           </span>
-          <span className="text-[#FF4A3D] font-semibold" style={textStyle}>
+          <span className="font-semibold" style={{ ...textStyle, color: 'var(--colour-error)' }}>
             {state.accepted ? fmtLoss(it[keyField]) : (
               <Masked inline scramble blur>{fmtLoss(it[keyField])}</Masked>
             )}
@@ -175,10 +175,10 @@ function Ribbon({ title, items, keyField, fontPx }: { title: string; items: Feed
   }, [items, keyField, fontPx, state.accepted]);
 
   return (
-    <div className="glass nv-glass--inner-hairline text-white border border-white/10 p-1 rounded-none w-full" ref={outerRef}>
+    <div className="glass nv-glass--inner-hairline p-1 rounded-none w-full" ref={outerRef} style={{ color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}>
       <div className="flex items-center gap-2 mb-1">
-        <div className="text-[12px] uppercase tracking-wider text-gray-300">{title}</div>
-        <div className="hidden md:inline text-[12px] text-gray-400">
+        <div className="text-[12px] uppercase tracking-wider" style={{ color: 'var(--colour-text-secondary)' }}>{title}</div>
+        <div className="hidden md:inline text-[12px]" style={{ color: 'var(--colour-text-muted)' }}>
           {state.accepted ? asOf : <Masked inline scramble blur>{asOf || '00 Jan 0000'}</Masked>}
         </div>
       </div>
@@ -377,11 +377,11 @@ export default function TickerRibbons({ size, mode = 'five_stars', country }: { 
       <div className="text-[12px] flex flex-col gap-1">
         <div ref={outerRef} className="rounded-none" style={{ height: '68px' }}>
           {loading ? (
-            <div className="glass nv-glass--inner-hairline text-white border border-white/10 p-1 rounded-none" style={{ height: '68px' }}>
+            <div className="glass nv-glass--inner-hairline p-1 rounded-none" style={{ height: '68px', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}>
               <div className="flex items-center gap-2 mb-1">
-                <div className="text-[12px] uppercase tracking-wider text-gray-300">{ribbonTitle}</div>
+                <div className="text-[12px] uppercase tracking-wider" style={{ color: 'var(--colour-text-secondary)' }}>{ribbonTitle}</div>
               </div>
-              <div className="flex items-center gap-2 text-[12px] text-gray-400 px-2 py-2">
+              <div className="flex items-center gap-2 text-[12px] px-2 py-2" style={{ color: 'var(--colour-text-muted)' }}>
                 <span className="spinner"></span>
                 <span>Loading…</span>
               </div>

@@ -41,10 +41,10 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
   };
 
   return (
-    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto relative p-3 pt-[60px] bg-[#212121] overscroll-none touch-pan-y" style={containerStyle}>
+    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto overflow-x-visible relative px-6 pt-[80px] overscroll-none touch-pan-y" style={{ ...containerStyle, background: 'var(--colour-surface)' }}>
       {loadingMore && (
         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-          <div className="h-5 w-5 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />
+          <div className="h-5 w-5 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--colour-text-muted)', borderTopColor: 'transparent' }} />
         </div>
       )}
       
@@ -156,9 +156,9 @@ const ChatFeed = React.forwardRef<HTMLDivElement, Props>(({ messages, matchesOpe
         {/* Typing indicator moved here to be displayed as the last message */}
         
         {typing && (
-          <div className="flex justify-start mt-4">
+            <div className="flex justify-start mt-4">
             {progressText ? (
-              <div className="min-h-[40px] flex items-center text-md font-medium text-white/80" data-testid="progress-indicator">
+              <div className="min-h-[40px] flex items-center text-sm font-light" style={{ color: 'var(--colour-text-secondary)' }} data-testid="progress-indicator">
                 <span className="thinking-wave">{progressText}</span>
               </div>
             ) : (

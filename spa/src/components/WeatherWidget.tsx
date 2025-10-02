@@ -90,40 +90,42 @@ export default function WeatherWidget({ text }: WeatherWidgetProps) {
     return <span>{text}</span>;
   }
 
+  console.log('WeatherWidget: weather', weather);
+
   return (
     <div className="space-y-3">
-      <div className="weather-widget bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/20 rounded-xl p-3 max-w-lg">
+      <div className="weather-widget rounded-xl p-3 max-w-lg" style={{ background: 'var(--colour-surface)', border: 'var(--effect-glass-border-1px)' }}>
         <div className="flex items-center justify-between gap-4">
           {/* Left: Icon + Location */}
           <div className="flex items-center gap-3">
             <span className="text-3xl">{getWeatherIcon(weather.condition)}</span>
             <div>
-              <h3 className="text-white font-medium text-lg leading-tight">{weather.location}</h3>
-              <p className="text-white/70 text-sm capitalize leading-tight">{weather.condition}</p>
+              <h3 className="font-medium text-lg leading-tight" style={{ color: 'var(--colour-text-primary)' }}>{weather.location}</h3>
+              <p className="text-sm capitalize leading-tight" style={{ color: 'var(--colour-text-secondary)' }}>{weather.condition}</p>
             </div>
           </div>
           
           {/* Center: Temperature */}
           <div className="flex items-end gap-1">
-            <span className="text-4xl font-bold text-white">{weather.temperature}</span>
-            <span className="text-white/70 text-xl mb-1">°C</span>
+            <span className="text-4xl font-bold" style={{ color: 'var(--colour-text-primary)' }}>{weather.temperature}</span>
+            <span className="text-xl mb-1" style={{ color: 'var(--colour-text-secondary)' }}>°C</span>
           </div>
           
           {/* Right: Wind info */}
           <div className="text-right">
             {weather.wind && (
-              <div className="flex items-center gap-1 text-sm text-white/80">
+              <div className="flex items-center gap-1 text-sm" style={{ color: 'var(--colour-text-primary)' }}>
                 <span>💨</span>
                 <span>{weather.wind} m/s</span>
               </div>
             )}
             {weather.humidity && (
-              <div className="flex items-center gap-1 text-sm text-white/80 mt-1">
+              <div className="flex items-center gap-1 text-sm mt-1" style={{ color: 'var(--colour-text-primary)' }}>
                 <span>💧</span>
                 <span>{weather.humidity}%</span>
               </div>
             )}
-            <p className="text-xs text-white/50 mt-1">Current</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--colour-text-muted)' }}>Current</p>
           </div>
         </div>
       </div>

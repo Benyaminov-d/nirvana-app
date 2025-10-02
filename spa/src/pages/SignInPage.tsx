@@ -48,7 +48,7 @@ export default function SignInPage() {
     <AuthLayout title="Sign In" imageSide={true}>
       <form onSubmit={doSignin} className="space-y-6">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
             Email Address
           </label>
           <input
@@ -57,17 +57,18 @@ export default function SignInPage() {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+            className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+            style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
             required
           />
         </div>
         
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="password" className="block text-sm font-medium" style={{ color: 'var(--colour-text-secondary)' }}>
               Password
             </label>
-            <Link to="/request-reset" className="text-sm text-blue-400 hover:text-blue-300 transition duration-200">
+            <Link to="/request-reset" className="text-sm transition duration-200" style={{ color: '#3b82f6' }}>
               Forgot password?
             </Link>
           </div>
@@ -77,7 +78,8 @@ export default function SignInPage() {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+            className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+            style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
             required
           />
         </div>
@@ -107,9 +109,9 @@ export default function SignInPage() {
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-sm text-gray-400">
+        <p className="text-sm" style={{ color: 'var(--colour-text-muted)' }}>
           Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-400 hover:text-blue-300 transition duration-200">
+          <Link to="/signup" className="transition duration-200" style={{ color: '#3b82f6' }}>
             Create account
           </Link>
         </p>

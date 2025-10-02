@@ -14,23 +14,24 @@ export const InlineSummaryCard: React.FC<InlineSummaryCardProps> = ({ data, symb
     : `${symbol} — Loading…`;
   
   return (
-    <div className="flex flex-col text-gray-200">
-      <div className="text-white font-semibold">{header}</div>
+    <div className="flex flex-col" style={{ color: 'var(--colour-text-primary)' }}>
+      <div className="font-semibold" style={{ color: 'var(--colour-text-primary)' }}>{header}</div>
       <div className="mt-3">
-        <div className="flex items-center gap-2 text-gray-200">
+        <div className="flex items-center gap-2" style={{ color: 'var(--colour-text-primary)' }}>
           <div className="font-medium">Expected loss levels</div>
           <button 
             type="button" 
             aria-label="What is this?" 
             title="Expected loss in a down year, Expected loss across 1 in 20 worst years (95-CVaR), Expected loss across 1 in 100 worst years (99-CVaR)" 
-            className="w-4 h-4 inline-flex items-center justify-center rounded-full border border-white/50 text-white/80 text-[10px]"
+            className="w-4 h-4 inline-flex items-center justify-center rounded-full text-[10px]"
+            style={{ border: '1px solid var(--colour-glass-border)', color: 'var(--colour-text-primary)' }}
           >
             ?
           </button>
         </div>
         
         {data?.loss_levels?.message ? (
-          <div className="text-amber-400 text-sm mt-2 p-3 bg-amber-500/10 rounded border border-amber-500/20">
+          <div className="text-sm mt-2 p-3 rounded" style={{ color: 'var(--colour-warning)', background: 'rgba(242,193,78,0.10)', border: '1px solid rgba(242,193,78,0.20)' }}>
             {data.loss_levels.message}
           </div>
         ) : (
@@ -50,7 +51,7 @@ export const InlineSummaryCard: React.FC<InlineSummaryCardProps> = ({ data, symb
           </div>
         )}
         
-        {!data && <div className="text-xs text-gray-400 mt-2 animate-pulse">Loading loss levels…</div>}
+        {!data && <div className="text-xs mt-2 animate-pulse" style={{ color: 'var(--colour-text-muted)' }}>Loading loss levels…</div>}
       </div>
     </div>
   );

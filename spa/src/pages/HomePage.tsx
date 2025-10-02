@@ -38,7 +38,7 @@ export default function HomePage() {
   // UI state
   const [typing, setTyping] = useState(false);
   const [progressText, setProgressText] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [locked, setLocked] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
@@ -677,7 +677,7 @@ export default function HomePage() {
     // Ensure we have a chat id (avoid duplicate creation due to async state)
     const ensuredChatId = await ensureChatId();
     
-    // Add user message to the chat
+    // Add user message to the chat (and drop welcome placeholder if present)
     const userMsg: ChatMessage = {
       key: `temp-${Date.now()}`,
       role: 'user',
@@ -687,7 +687,9 @@ export default function HomePage() {
     };
     
       setMessages(prev => {
-        const combined = [...prev, userMsg];
+        // Remove centered welcome placeholder message if it exists
+        const filtered = (prev || []).filter(m => !(m.kind === 'text' && m.role === 'assistant' && (m.text || '').trim() === 'Welcome to Nirvana'));
+        const combined = [...filtered, userMsg];
         console.log("Combined messages with user msg:", combined);
         const uniqueMessages = dedupConsecutive(combined);
         console.log("After deduplication (user msg):", uniqueMessages);
@@ -1473,12 +1475,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col h-[100svh] bg-black text-white bg-cover bg-center bg-no-repeat" 
-         style={{ 
-           backgroundImage: `url(${new URL('../assets/bg.JPG', import.meta.url).toString()})`,
-           backgroundBlendMode: 'overlay',
-           backgroundColor: 'rgb(35 35 35 / 83%)'
-         }}>
+    <div className="flex flex-col h-[100svh] nv-text-primary" style={{ background: 'var(--colour-surface)' }}>
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Talks List */}
         <TalksSidebar
@@ -1488,27 +1485,29 @@ export default function HomePage() {
           onCreate={handleCreateChat}
           open={showSidebar}
           onClose={() => setShowSidebar(false)}
+          onOpen={() => setShowSidebar(true)}
         />
 
-        {/* Center wrapper to keep Chat + Right pane centered; reserve sidebar width on desktop */}
-        <div className="flex-1 overflow-hidden flex justify-center md:pl-0">
-          <div className="flex items-stretch w-full md:w-auto justify-center">
+        {/* Center area stretches to fill remaining width by default */}
+        <div className="flex flex-1 overflow-hidden">
+          <div className="flex relative items-stretch w-full min-w-0">
             {/* Middle: Chat Messages */}
-            <div className="relative w-full max-w-[48rem] md:min-w-[48rem] flex-shrink-0 h-[100svh] md:h-auto flex flex-col overflow-hidden p-0 glass nv-glass--inner-hairline border border-white/10 rounded-2xl m-2">
-              <div className="flex items-center justify-between mb-4 absolute top-0 left-0 h-[60px] w-full p-4 z-10 backdrop-blur-md">
+            <div className="relative flex-1 min-w-0 h-[100svh] md:h-auto flex flex-col overflow-hidden p-0 m-0" style={{ background: 'var(--colour-surface)' }}>
+              <div className="flex items-center w-full justify-between mb-4 absolute top-0 !border-b-[1px] left-0 h-[60px] p-4 z-10 backdrop-blur-md">
                 <div className="flex items-center">
                   <button
                     type="button"
-                    onClick={toggleSidebar}
-                    className="mr-3 w-6 h-6 flex items-center justify-center rounded-full bg-[#c19658]/80 hover:bg-[#c19658] text-black transition-colors text-xs"
-                    aria-label={showSidebar ? "Hide Products" : "Show sidebar"}
+                    onClick={() => setShowSidebar(true)}
+                    className="mr-3 w-6 h-6 flex items-center justify-center rounded-full transition-colors text-xs md:hidden"
+                    style={{ border: '1px solid var(--colour-standard-pass)', color: '#000' }}
+                    aria-label="Open sidebar"
                   >
-                    {showSidebar ? "←" : "→"}
+                    →
                   </button>
                   <div className="flex gap-2 items-start">
-                    <p className="text-white !text-4xl trajan-text trajan-text">Proximity</p>
-                    <p className="text-white text-md trajan-text relative right-1 bottom-1">Search</p>
-                    <div className="relative right-2 bottom-2 mb-0 ml-0">
+                    <p className="!text-2xl trajan-text trajan-text nv-text-primary">Satya</p>
+                    {/* <p className="text-md trajan-text relative right-1 bottom-1 nv-text-primary">Search</p> */}
+                    {/* <div className="relative right-2 bottom-2 mb-0 ml-0">
                       <button
                         type="button"
                         aria-label="What's this?"
@@ -1517,17 +1516,17 @@ export default function HomePage() {
                         onFocus={() => setShowTip(true)}
                         onBlur={() => setShowTip(false)}
                         onClick={() => setShowTip((v) => !v)}
-                        className="w-3 h-3 inline-flex items-center justify-center rounded-full border border-white/40 text-white/80 hover:text-white hover:border-white text-[8px]"
-                        title="What's this?"
+                        className="w-3 h-3 inline-flex items-center justify-center rounded-full text-[8px]"
+                        style={{ border: '1px solid var(--colour-glass-border)', color: 'var(--colour-text-primary)' }}
                       >
                         i
                       </button>
                       {showTip && (
-                        <div className="text-[12px] absolute top-full left-1/2 -translate-x-1/2 mt-2 z-10 text-gray-300 bg-black/40 border border-white/10 rounded-md p-2 w-fit whitespace-nowrap">
+                        <div className="text-[12px] absolute top-full left-1/2 -translate-x-1/2 mt-2 z-10 rounded-md p-2 w-fit whitespace-nowrap" style={{ color: 'var(--colour-text-primary)', background: 'var(--colour-surface)', border: '1px solid var(--colour-glass-border)', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
                           Nirvana's search engine
                         </div>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -1535,7 +1534,8 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={handleToggleProducts}
-                    className="px-2 py-1 rounded-md bg-[#c19658]/80 hover:bg-[#c19658] text-black text-xs transition-colors flex items-center gap-1 md:hidden"
+                    className="px-2 py-1 rounded-md text-xs transition-colors flex items-center gap-1 md:hidden"
+                    style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
                   >
                     {matchesOpen ? 'Hide Products List' : 'Show Products List'}
                     {matchesOpen ? (
@@ -1553,54 +1553,121 @@ export default function HomePage() {
                 )}
               </div>
 
-              <ChatFeed
-                ref={chatFeedRef}
-                messages={messages}
-                matchesOpen={matchesOpen}
-                onToggleProducts={handleToggleProducts}
-                loadingMore={loadingMore}
-                hydrating={loading}
-                typing={typing}
-                progressText={progressText}
-                onTopReached={handleLoadMore}
-                onScrollPositionChange={({ atBottom }) => { stickToBottomRef.current = atBottom; }}
-                bottomInset={keyboardInset}
-              />
+              {(() => {
+                const hasRealMessages = Array.isArray(messages) && messages.some(m => {
+                  if (!m) return false;
+                  if (m.kind !== 'text') return true;
+                  const t = (m.text || '').trim();
+                  return !(m.role === 'assistant' && t === 'Welcome to Nirvana');
+                });
+                const isEmptyChat = !hasRealMessages && !loading; // suppress empty hero during initial load
+                return (
+                  <>
+                    {/* Messages feed (hidden for empty state to avoid bubble rendering) */}
+                    {!isEmptyChat && (
+                      <ChatFeed
+                        ref={chatFeedRef}
+                        messages={messages}
+                        matchesOpen={matchesOpen}
+                        onToggleProducts={handleToggleProducts}
+                        loadingMore={loadingMore}
+                        hydrating={loading}
+                        typing={typing}
+                        progressText={progressText}
+                        onTopReached={handleLoadMore}
+                        onScrollPositionChange={({ atBottom }) => { stickToBottomRef.current = atBottom; }}
+                        bottomInset={keyboardInset}
+                      />
+                    )}
+                    {/* Input + hero container when empty */}
+                    {isEmptyChat && (
+                      <div className="absolute inset-0 flex items-center justify-center z-10">
+                        <div className="w-full px-3 mb-[100px]">
+                          <div className="max-w-3xl mx-auto text-center mb-12 select-none">
+                            <div className="nv-text-primary text-2xl md:text-3xl">Welcome to Nirvana</div>
+                          </div>
+                          <div className="max-w-3xl mx-auto">
+                            <form onSubmit={handleSubmit} className="flex items-center gap-3 rounded-xl glass p-1">
+                              <div className="px-4 py-3 flex-1 relative">
+                                <textarea
+                                  ref={inputRef}
+                                  rows={1}
+                                  placeholder="Say anything.."
+                                      className="w-full bg-transparent outline-none leading-6 min-h-[20px] max-h-[140px] resize-none overflow-hidden nv-text-primary"
+                                      style={{ color: 'var(--colour-text-primary)' }}
+                                  disabled={locked}
+                                  onInput={(e)=>{
+                                    const el = e.currentTarget;
+                                    el.style.height = 'auto';
+                                    const maxH = 140;
+                                    const newH = Math.min(el.scrollHeight, maxH);
+                                    el.style.height = `${newH}px`;
+                                    el.style.overflowY = el.scrollHeight > maxH ? 'auto' : 'hidden';
+                                  }}
+                                  onKeyDown={(e)=>{
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                      e.preventDefault();
+                                      handleSubmit(e as any);
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <button
+                                type="submit" 
+                                disabled={locked} 
+                                className="h-[40px] px-5 mr-1 rounded-xl transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                                style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
+                              >
+                                <span className="text-sm">Enter</span>
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-              <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }}>
-                <form onSubmit={handleSubmit} className="flex items-center gap-3 border border-white/20 rounded-xl glass nv-glass--inner-hairline p-1">
-              <div className="px-4 py-3 flex-1 relative">
-                <textarea
-                  ref={inputRef}
-                  rows={1}
-                  placeholder="Say anything.."
-                  className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 leading-6 min-h-[20px] max-h-[140px] resize-none overflow-hidden"
-                  disabled={locked}
-                  onInput={(e)=>{
-                    const el = e.currentTarget;
-                    el.style.height = 'auto';
-                    const maxH = 140;
-                    const newH = Math.min(el.scrollHeight, maxH);
-                    el.style.height = `${newH}px`;
-                    el.style.overflowY = el.scrollHeight > maxH ? 'auto' : 'hidden';
-                  }}
-                  onKeyDown={(e)=>{
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSubmit(e as any);
-                    }
-                  }}
-                />
+                    {/* Bottom-aligned input when there are messages */}
+                    {!isEmptyChat && (
+                      <div className="absolute bottom-0 left-0 right-0 p-3 z-10 ios-safe-bottom" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }}>
+                        <form onSubmit={handleSubmit} className="flex items-center gap-3 rounded-xl glass p-1">
+                  <div className="px-4 py-3 flex-1 relative">
+                    <textarea
+                      ref={inputRef}
+                      rows={1}
+                      placeholder="Say anything.."
+                          className="w-full bg-transparent outline-none leading-6 min-h-[20px] max-h-[140px] resize-none overflow-hidden nv-text-primary"
+                          style={{ color: 'var(--colour-text-primary)' }}
+                      disabled={locked}
+                      onInput={(e)=>{
+                        const el = e.currentTarget;
+                        el.style.height = 'auto';
+                        const maxH = 140;
+                        const newH = Math.min(el.scrollHeight, maxH);
+                        el.style.height = `${newH}px`;
+                        el.style.overflowY = el.scrollHeight > maxH ? 'auto' : 'hidden';
+                      }}
+                      onKeyDown={(e)=>{
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSubmit(e as any);
+                        }
+                      }}
+                    />
                   </div>
                   <button
                     type="submit" 
                     disabled={locked} 
-                    className="h-[40px] px-5 mr-1 bg-[#c19658] rounded-xl text-black hover:bg-[#d1a668] transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="h-[40px] px-5 mr-1 rounded-xl transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
                   >
                     <span className="text-sm">Enter</span>
                   </button>
-                </form>
-              </div>
+                        </form>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Right: Details or Matches (kept mounted to avoid unmount resets) */}

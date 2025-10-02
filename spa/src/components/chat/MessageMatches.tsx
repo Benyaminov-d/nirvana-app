@@ -9,10 +9,10 @@ export const MessageMatches: React.FC<{
   matchesOpen?: boolean;
 }> = ({ items, asOf, extraClass }) => (
   <div className={`flex justify-end ${extraClass || ''}`}>
-    <div className="chat-bubble chat-bubble--right chat-bubble--assistant max-w-[90%]">
-      <div className="text-xs text-gray-400 mb-2">{asOf ? `as of ${asOf}` : ''}</div>
+    <div className="chat-bubble chat-bubble--right px-4 py-1.5 chat-bubble--assistant max-w-[90%]">
+      <div className="text-xs mb-2" style={{ color: 'var(--colour-text-muted)' }}>{asOf ? `as of ${asOf}` : ''}</div>
 
-      <div className="text-xs text-gray-300 mt-1 mb-2">
+      <div className="text-xs mt-1 mb-2" style={{ color: 'var(--colour-text-secondary)' }}>
         {Array.isArray(items) ? items.length : 20} products found
       </div>
     </div>

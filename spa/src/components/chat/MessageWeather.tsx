@@ -8,7 +8,7 @@ export const MessageWeather: React.FC<{ text: string; extraClass?: string }> = (
     <div className="w-full">
       <div className="space-y-2">
         <WeatherWidget text={text} />
-        <div className="text-white/80 text-sm">
+        <div className="text-sm" style={{ color: 'var(--colour-text-secondary)' }}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{

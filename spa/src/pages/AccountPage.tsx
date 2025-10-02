@@ -226,18 +226,19 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto text-white min-h-screen h-screen overflow-y-auto">
+    <div className="p-6 max-w-4xl mx-auto min-h-screen h-screen overflow-y-auto" style={{ color: 'var(--colour-text-primary)' }}>
       <h1 className="text-2xl font-semibold mb-2">Account</h1>
-      <p className="text-white/70 mb-6">{user?.email}</p>
+      <p className="mb-6" style={{ color: 'var(--colour-text-secondary)' }}>{user?.email}</p>
 
       {/* Low balance banner */}
       {!loading && !error && profile?.wallet_low_balance && (
-        <div className="mb-6 p-4 rounded-lg border border-yellow-400/30 bg-yellow-900/20 text-yellow-200 flex items-center justify-between">
+        <div className="mb-6 p-4 rounded-lg flex items-center justify-between" style={{ border: '1px solid rgba(242,193,78,0.30)', background: 'rgba(242,193,78,0.10)', color: 'var(--colour-warning)' }}>
           <div>
             Your AI wallet balance is low. Minimum recommended balance is {formatCents(profile.ai_min_balance_cents || 0, profile.wallet?.currency || 'USD')}.
           </div>
           <button
-            className="ml-4 px-3 py-2 rounded bg-yellow-600 hover:bg-yellow-500 text-black"
+            className="ml-4 px-3 py-2 rounded"
+            style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
             onClick={handleTopUp}
           >
             Top up now
@@ -246,10 +247,10 @@ export default function AccountPage() {
       )}
 
       {/* Wallet */}
-      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6">
+      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6" style={{ border: 'var(--effect-glass-border-1px)' }}>
         <h2 className="text-xl font-semibold mb-4">AI Wallet</h2>
-        {loading && <p className="text-white/70">Loading...</p>}
-        {error && <p className="text-red-400">{error}</p>}
+        {loading && <p style={{ color: 'var(--colour-text-secondary)' }}>Loading...</p>}
+        {error && <p style={{ color: 'var(--colour-error)' }}>{error}</p>}
         {!loading && !error && profile && (
           <>
             <div className="flex items-center justify-between mb-4">
@@ -257,7 +258,8 @@ export default function AccountPage() {
                 Balance: {formatCents(profile.wallet?.balance_cents || 0, profile.wallet?.currency || 'USD')}
               </div>
               <button
-                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900"
+                className="px-4 py-2 rounded"
+                style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
                 disabled={isTopUpLoading}
                 onClick={handleTopUp}
               >
@@ -266,7 +268,7 @@ export default function AccountPage() {
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
-                <thead className="text-white/60">
+                <thead style={{ color: 'var(--colour-text-secondary)' }}>
                   <tr>
                     <th className="py-2 pr-4">Date</th>
                     <th className="py-2 pr-4">Kind</th>
@@ -276,11 +278,11 @@ export default function AccountPage() {
                 </thead>
                 <tbody>
                   {(profile.wallet?.transactions || []).map((t) => (
-                    <tr key={t.id} className="border-t border-white/10">
+                    <tr key={t.id} style={{ borderTop: 'var(--effect-glass-border-1px)' }}>
                       <td className="py-2 pr-4">{formatDate(t.created_at)}</td>
                       <td className="py-2 pr-4 uppercase">{t.kind}</td>
                       <td className="py-2 pr-4">{formatCents(t.amount_cents, t.currency)}</td>
-                      <td className="py-2 pr-4 text-white/70">{t.related_type || ''} {t.related_id || ''}</td>
+                      <td className="py-2 pr-4" style={{ color: 'var(--colour-text-secondary)' }}>{t.related_type || ''} {t.related_id || ''}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -291,16 +293,17 @@ export default function AccountPage() {
       </div>
 
       {/* Subscriptions */}
-      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6">
+      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6" style={{ border: 'var(--effect-glass-border-1px)' }}>
         <h2 className="text-xl font-semibold mb-4">Subscriptions</h2>
-        {loading && <p className="text-white/70">Loading...</p>}
+        {loading && <p style={{ color: 'var(--colour-text-secondary)' }}>Loading...</p>}
         {!loading && !error && (
           <>
             {(profile?.subscriptions || []).length === 0 && (
               <div className="flex items-center justify-between">
-                <p className="text-white/70">No active subscriptions.</p>
+                <p style={{ color: 'var(--colour-text-secondary)' }}>No active subscriptions.</p>
                 <button
-                  className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 disabled:bg-purple-900"
+                  className="px-4 py-2 rounded"
+                  style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
                   disabled={isSubLoading}
                   onClick={handleSubscribe}
                 >
@@ -311,7 +314,7 @@ export default function AccountPage() {
             {(profile?.subscriptions || []).length > 0 && (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="text-white/60">
+                  <thead style={{ color: 'var(--colour-text-secondary)' }}>
                     <tr>
                       <th className="py-2 pr-4">Product</th>
                       <th className="py-2 pr-4">Plan</th>
@@ -322,7 +325,7 @@ export default function AccountPage() {
                   </thead>
                   <tbody>
                     {(profile?.subscriptions || []).map((s, i) => (
-                      <tr key={i} className="border-t border-white/10">
+                      <tr key={i} style={{ borderTop: 'var(--effect-glass-border-1px)' }}>
                         <td className="py-2 pr-4">{s.product_name || s.product_sku || '—'}</td>
                         <td className="py-2 pr-4">{s.interval || '—'}</td>
                         <td className="py-2 pr-4 uppercase">{s.status}</td>
@@ -330,7 +333,8 @@ export default function AccountPage() {
                         <td className="py-2 pr-4 text-right">
                           {s.status?.toLowerCase() === 'active' && (
                             <button
-                              className="px-3 py-1 rounded bg-red-700 hover:bg-red-600 disabled:bg-red-900 text-sm"
+                              className="px-3 py-1 rounded text-sm"
+                              style={{ background: 'var(--colour-error)', color: '#fff' }}
                               disabled={isCancelLoading}
                               onClick={() => handleCancel(s.external_subscription_id)}
                             >
@@ -350,9 +354,9 @@ export default function AccountPage() {
 
       {/* Entitlements */}
       {Boolean(profile?.entitlements && profile.entitlements.length > 0) && (
-        <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6">
+        <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6" style={{ border: 'var(--effect-glass-border-1px)' }}>
           <h2 className="text-xl font-semibold mb-4">Entitlements</h2>
-          <ul className="list-disc list-inside text-white/90">
+          <ul className="list-disc list-inside" style={{ color: 'var(--colour-text-primary)' }}>
             {(profile?.entitlements || []).map((e) => (
               <li key={e.id}>
                 {e.tier} {e.expires_at ? `(expires ${formatDate(e.expires_at)})` : ''}
@@ -363,12 +367,12 @@ export default function AccountPage() {
       )}
 
       {/* Invoices */}
-      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6">
+      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6" style={{ border: 'var(--effect-glass-border-1px)' }}>
         <h2 className="text-xl font-semibold mb-4">Invoices</h2>
         {!loading && !error && (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="text-white/60">
+              <thead style={{ color: 'var(--colour-text-secondary)' }}>
                 <tr>
                   <th className="py-2 pr-4">Issued</th>
                   <th className="py-2 pr-4">Status</th>
@@ -378,7 +382,7 @@ export default function AccountPage() {
               </thead>
               <tbody>
                 {invoices.map((inv) => (
-                  <tr key={inv.id} className="border-t border-white/10">
+                  <tr key={inv.id} style={{ borderTop: 'var(--effect-glass-border-1px)' }}>
                     <td className="py-2 pr-4">{formatDate(inv.issued_at || '')}</td>
                     <td className="py-2 pr-4 uppercase">{inv.status || ''}</td>
                     <td className="py-2 pr-4">{formatCents(inv.amount_due_cents, inv.currency || 'USD')}</td>
@@ -392,12 +396,12 @@ export default function AccountPage() {
       </div>
 
       {/* Payments */}
-      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6">
+      <div className="glass nv-glass--inner-hairline rounded-2xl p-6 mb-6" style={{ border: 'var(--effect-glass-border-1px)' }}>
         <h2 className="text-xl font-semibold mb-4">Payments</h2>
         {!loading && !error && (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="text-white/60">
+              <thead style={{ color: 'var(--colour-text-secondary)' }}>
                 <tr>
                   <th className="py-2 pr-4">Date</th>
                   <th className="py-2 pr-4">Status</th>
@@ -407,7 +411,7 @@ export default function AccountPage() {
               </thead>
               <tbody>
                 {payments.map((p) => (
-                  <tr key={p.id} className="border-t border-white/10">
+                  <tr key={p.id} style={{ borderTop: 'var(--effect-glass-border-1px)' }}>
                     <td className="py-2 pr-4">{formatDate(p.created_at || '')}</td>
                     <td className="py-2 pr-4 uppercase">{p.status || ''}</td>
                     <td className="py-2 pr-4">{formatCents(p.amount_cents, p.currency || 'USD')}</td>
@@ -421,10 +425,10 @@ export default function AccountPage() {
       </div>
 
       {/* Usage */}
-      <div className="glass nv-glass--inner-hairline rounded-2xl p-6">
+      <div className="glass nv-glass--inner-hairline rounded-2xl p-6" style={{ border: 'var(--effect-glass-border-1px)' }}>
         <h2 className="text-xl font-semibold mb-4">AI Usage (last 30 days)</h2>
-        {loading && <p className="text-white/70">Loading...</p>}
-        {error && <p className="text-red-400">{error}</p>}
+        {loading && <p style={{ color: 'var(--colour-text-secondary)' }}>Loading...</p>}
+        {error && <p style={{ color: 'var(--colour-error)' }}>{error}</p>}
         {!loading && !error && usage && (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -466,9 +470,9 @@ export default function AccountPage() {
 
 function Stat({ label, value }: { label: string; value: any }) {
   return (
-    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-      <div className="text-white/60 text-xs uppercase tracking-wide mb-1">{label}</div>
-      <div className="text-lg font-semibold">{value}</div>
+    <div className="rounded-xl p-4" style={{ background: 'var(--colour-surface)', border: 'var(--effect-glass-border-1px)' }}>
+      <div className="text-xs uppercase tracking-wide mb-1" style={{ color: 'var(--colour-text-secondary)' }}>{label}</div>
+      <div className="text-lg font-semibold" style={{ color: 'var(--colour-text-primary)' }}>{value}</div>
     </div>
   );
 }

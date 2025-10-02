@@ -25,9 +25,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (isLoading || isChecking) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="glass nv-glass--inner-hairline border border-white/10 rounded-2xl p-8 flex flex-col items-center">
+        <div className="glass nv-glass--inner-hairline border rounded-2xl p-8 flex flex-col items-center">
           <div className="spinner mr-3"></div>
-          <p className="text-white mt-4">Verifying authentication...</p>
+          <p className="mt-4">Verifying authentication...</p>
         </div>
       </div>
     );

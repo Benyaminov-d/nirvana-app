@@ -104,7 +104,7 @@ export default function SignUpPage() {
       <form onSubmit={doSignup} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="first-name" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="first-name" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
               First Name
             </label>
             <input
@@ -113,12 +113,13 @@ export default function SignUpPage() {
               placeholder="Enter your first name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+              style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
               required
             />
           </div>
           <div>
-            <label htmlFor="last-name" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="last-name" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
               Last Name
             </label>
             <input
@@ -127,7 +128,8 @@ export default function SignUpPage() {
               placeholder="Enter your last name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+              style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
               required
             />
           </div>
@@ -135,7 +137,7 @@ export default function SignUpPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
-            <label htmlFor="birthdate" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="birthdate" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
               Birthdate
             </label>
             <input
@@ -143,20 +145,22 @@ export default function SignUpPage() {
               type="date"
               value={birthdate}
               onChange={(e) => setBirthdate(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+              style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
               required
             />
-            <p className="text-xs text-gray-400 mt-1">You must be 18 years or older.</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--colour-text-muted)' }}>You must be 18 years or older.</p>
           </div>
           <div>
-            <label htmlFor="region" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="region" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
               Location
             </label>
             <select
               id="region"
               value={region || ''}
               onChange={(e) => setRegion((e.target.value || 'OTHER') as Region)}
-              className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+              style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
               required
             >
               <option value="" disabled>Select region…</option>
@@ -190,7 +194,7 @@ export default function SignUpPage() {
           </div>
         </div> */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
             Email Address
           </label>
           <input
@@ -199,13 +203,14 @@ export default function SignUpPage() {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+            className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+            style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
             required
           />
         </div>
         
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium mb-1" style={{ color: 'var(--colour-text-secondary)' }}>
             Password
           </label>
           <input
@@ -214,7 +219,8 @@ export default function SignUpPage() {
             placeholder="Create a password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+            className="w-full px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+            style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
             required
           />
           <input
@@ -223,7 +229,8 @@ export default function SignUpPage() {
             placeholder="Confirm your password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full mt-2 px-4 py-3 rounded-lg bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition duration-200"
+            className="w-full mt-2 px-4 py-3 rounded-lg focus:outline-none transition duration-200"
+            style={{ background: 'var(--colour-surface)', color: 'var(--colour-text-primary)', border: 'var(--effect-glass-border-1px)' }}
             required
           />
         </div>
@@ -234,7 +241,7 @@ export default function SignUpPage() {
           </label> */}
         </div>
 
-        <label className="text-sm flex items-start gap-2">
+        <label className="text-sm flex items-start gap-2" style={{ color: 'var(--colour-text-primary)' }}>
           <input
             type="checkbox"
             className="mt-1"
@@ -243,14 +250,14 @@ export default function SignUpPage() {
             required
           />
           <span>
-            I accept the <a href="https://nirvana.bm/member-eula" target="_blank" rel="noopener noreferrer" className="underline text-gray-200 hover:text-white">Member EULA </a>
+            I accept the <a href="https://nirvana.bm/member-eula" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: 'var(--colour-text-primary)' }}>Member EULA </a>
             
             and understand that search results are information only and are not advice or a recommendation.
           </span>
         </label>
 
         {status && (
-          <div className={`py-2 px-3 rounded-md ${status.includes('successfully') || status.includes('Redirecting') || status.includes('Account created.') ? 'bg-green-900/50 text-green-200' : 'bg-red-900/50 text-red-200'}`}>
+          <div className={`py-2 px-3 rounded-md`} style={{ background: status.includes('successfully') || status.includes('Redirecting') || status.includes('Account created.') ? 'rgba(34,195,166,0.15)' : 'rgba(214,69,69,0.15)', color: status.includes('successfully') || status.includes('Redirecting') || status.includes('Account created.') ? 'var(--colour-success)' : 'var(--colour-error)' }}>
             {status}
           </div>
         )}
@@ -274,9 +281,9 @@ export default function SignUpPage() {
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-sm text-gray-400">
+        <p className="text-sm" style={{ color: 'var(--colour-text-muted)' }}>
           Already have an account?{' '}
-          <Link to="/signin" className="text-blue-400 hover:text-blue-300 transition duration-200">
+          <Link to="/signin" className="transition duration-200" style={{ color: '#3b82f6' }}>
             Sign in
           </Link>
         </p>

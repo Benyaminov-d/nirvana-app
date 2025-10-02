@@ -41,6 +41,7 @@ type Props = {
   onCreate: () => void;
   open: boolean;
   onClose?: () => void;
+  onOpen?: () => void;
 };
 
 const MobileDrawerLeft: React.FC<{ open: boolean; onClose?: () => void; children: React.ReactNode }>
@@ -69,9 +70,10 @@ const MobileDrawerLeft: React.FC<{ open: boolean; onClose?: () => void; children
 
   return createPortal(
     <div className="fixed inset-0 z-[60] md:hidden" onClick={handleBackdropClick}>
-      <div className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${animOpen ? 'opacity-100' : 'opacity-0'}`} />
+      <div className={`absolute inset-0 transition-opacity duration-300 ${animOpen ? 'opacity-100' : 'opacity-0'}`} style={{ background: 'var(--colour-overlay)' }} />
       <div 
-        className={`absolute inset-y-0 left-0 w-[85vw] max-w-[340px] bg-black/90 backdrop-blur-md border-r border-white/10 p-4 shadow-2xl h-full overflow-auto transform-gpu will-change-transform transform transition-transform duration-300 ease-in-out ${animOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`absolute inset-y-0 left-0 w-[85vw] max-w-[340px] backdrop-blur-md p-4 shadow-2xl h-full overflow-auto transform-gpu will-change-transform transform transition-transform duration-300 ease-in-out ${animOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ background: 'var(--colour-bg-black)', borderRight: '1px solid var(--colour-glass-border)' }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -83,7 +85,7 @@ const MobileDrawerLeft: React.FC<{ open: boolean; onClose?: () => void; children
   );
 };
 
-export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCreate, open, onClose }) => {
+export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCreate, open, onClose, onOpen }) => {
   const formatPreview = (c: ChatSummary): string => {
     try {
       const kind = (c.last_message && c.last_message.kind) || null;
@@ -147,7 +149,7 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
     return `${dd}.${mm}.${yyyy}`;
   };
 
-  const UserMenuDropup: React.FC<{ onAction?: () => void }> = ({ onAction }) => {
+  const UserMenuDropup: React.FC<{ onAction?: () => void; compact?: boolean }> = ({ onAction, compact = false }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [open, setOpen] = React.useState(false);
@@ -187,31 +189,41 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="w-full px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-200 flex items-center justify-between"
+          className={compact ? 'w-9 h-9 rounded-full flex items-center justify-center' : 'w-full px-3 py-2 rounded-lg flex items-center justify-between'}
           aria-haspopup="menu"
           aria-expanded={open}
+          style={{ background: '#FFFFFF', color: '#0A0A0A', border: '1px solid #ECECEC' }}
         >
-          <span className="truncate text-sm">{displayName}</span>
-          <span className="ml-2 text-xs">{open ? '▲' : '▼'}</span>
+          {compact ? (
+            <span className="text-sm font-medium" style={{ color: '#0A0A0A' }}>{(displayName || 'U').charAt(0).toUpperCase()}</span>
+          ) : (
+            <>
+              <span className="truncate text-sm" style={{ color: '#0A0A0A' }}>{displayName}</span>
+              <span className="ml-2 text-xs" style={{ color: '#6B7280' }}>{open ? '▲' : '▼'}</span>
+            </>
+          )}
         </button>
         {open && (
           <div
             role="menu"
-            className="absolute bottom-full left-0 right-0 mb-2 glass nv-glass--inner-hairline border border-white/10 rounded-lg overflow-hidden shadow-xl z-10 bg-[#212121]"
+            className={compact ? 'absolute bottom-10 left-full ml-2 z-20' : 'absolute bottom-full left-0 right-0 mb-2 z-10'}
+            style={{ background: '#FFFFFF', border: '1px solid #ECECEC', borderRadius: 8, boxShadow: '0 2px 16px rgba(0,0,0,0.08)' }}
           >
             <button
               type="button"
               onClick={goAccount}
-              className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-white/10"
+              className="w-full text-left px-3 py-2 text-sm"
+              style={{ color: '#0A0A0A' }}
               role="menuitem"
             >
               Account
             </button>
-            <div className="h-px bg-white/10" />
+            <div style={{ height: 1, background: '#ECECEC' }} />
             <button
               type="button"
               onClick={goLogout}
-              className="w-full text-left px-3 py-2 text-sm text-red-300 hover:bg-white/10"
+              className="w-full text-left px-3 py-2 text-sm"
+              style={{ color: '#D64545' }}
               role="menuitem"
             >
               Sign out
@@ -225,63 +237,115 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
   return (
     <>
       {/* Desktop sidebar */}
-      <div className={`${open ? 'hidden md:flex' : 'hidden'} md:flex-col md:w-64 glass nv-glass--inner-hairline !bg-[#212121] border border-white/10 rounded-2xl p-2 m-2 md:h-[calc(100dvh-1rem)] md:overflow-hidden`}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-lg font-medium text-white trajan-text">Sessions</div>
-          <button 
-            type="button" 
-            onClick={onCreate} 
-            className="px-3 py-1 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-sm text-black font-medium transition-colors" 
-            aria-label="New session"
-          >
-            New
-          </button>
-        </div>
-        <div className="flex-1 overflow-auto pr-0">
-          {[...(chats || [])]
-            .sort((a, b) => {
-              const ts = (c: ChatSummary) => {
-                const u = c.updated_at ? new Date(c.updated_at).getTime() : 0;
-                const l = c.last_message?.created_at ? new Date(c.last_message.created_at).getTime() : 0;
-                const cr = c.created_at ? new Date(c.created_at).getTime() : 0;
-                return Math.max(u || 0, l || 0, cr || 0);
-              };
-              return ts(b) - ts(a);
-            })
-            .map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => onSelect(c.id)}
-              className={`w-full text-left p-3 rounded-lg mb-2 transition-all duration-200 ${
-                activeId === c.id 
-                  ? 'bg-white/15 border-l-4 border-[#c19658]' 
-                  : 'hover:bg-white/10 border-l-4 border-transparent'
-              } text-gray-200`}
+      <div className={`hidden md:flex md:flex-col p-0 m-0 md:h-[100dvh] md:overflow-visible transition-all duration-300 group`} style={{ background: 'var(--colour-panel-bg)', color: '#0A0A0A', borderRight: '1px solid var(--colour-panel-border)', width: open ? 256 : 56 }}>
+        <div className={`${open ? 'p-4' : ''}`}>
+          <div className={`${open ? 'flex items-center justify-between' : 'm-4'}`}>
+            <div className="relative w-6 h-6">
+              <img src={new URL('../../assets/nirvana_bird.png', import.meta.url).toString()} alt="Nirvana" width={24} height={24} 
+                className={
+                  `${open ? '' : 'absolute inset-0 transition-opacity duration-200 group-hover:opacity-0'} block`
+              } />
+              {!open && (
+                <button
+                  type="button"
+                  onClick={onOpen}
+                  className={
+                    `${open ? '' : 'absolute inset-0 w-6 h-6 flex items-center justify-center rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity'} block`
+                  }
+                  style={{ border: '1px solid var(--colour-standard-pass)', color: '#000' }}
+                  aria-label="Show sidebar"
+                >
+                  →
+                </button>
+              )}
+            </div>
+            {open && onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-6 h-6 flex items-center justify-center rounded-full text-xs"
+                style={{ border: '1px solid var(--colour-standard-pass)', color: '#000' }}
+                aria-label="Hide sidebar"
+              >
+                ←
+              </button>
+            )}
+          </div>
+          {open ? (
+            <button 
+              type="button" 
+              onClick={onCreate} 
+              className="mt-5 px-3 py-1 w-full rounded-lg text-sm transition-colors block mx-auto" 
+              style={{ border: '1px solid var(--colour-standard-pass)', color: '#000' }}
+              aria-label="New session"
             >
-              <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-medium truncate">{c.title || 'New session'}</div>
-                <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(getLastTimestamp(c))}</div>
-              </div>
-              <div className="text-xs text-gray-400 mt-1 truncate">
-                {ellipsize(stripMarkdown(formatPreview(c)))}
-              </div>
+              New Session
             </button>
-          ))}
+          ) : (
+            <button
+              type="button"
+              onClick={onCreate}
+              className="mt-5 w-9 h-9 flex items-center justify-center rounded-lg text-lg mx-auto block"
+              style={{ border: '1px solid var(--colour-standard-pass)', color: '#000' }}
+              aria-label="New session"
+              title="New session"
+            >
+              +
+            </button>
+          )}
         </div>
-        <div className="pt-2 border-t border-white/10">
-          <UserMenuDropup />
-        </div>
+        {open ? (
+          <>
+            <div className="flex-1 overflow-auto pr-0 px-1">
+              {[...(chats || [])]
+                .sort((a, b) => {
+                  const ts = (c: ChatSummary) => {
+                    const u = c.updated_at ? new Date(c.updated_at).getTime() : 0;
+                    const l = c.last_message?.created_at ? new Date(c.last_message.created_at).getTime() : 0;
+                    const cr = c.created_at ? new Date(c.created_at).getTime() : 0;
+                    return Math.max(u || 0, l || 0, cr || 0);
+                  };
+                  return ts(b) - ts(a);
+                })
+                .map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => onSelect(c.id)}
+                  className={`w-full text-left p-3 rounded-lg mb-2 transition-all duration-200 border-l-4`}
+                  style={{ background: activeId === c.id ? 'var(--colour-panel-active)' : 'transparent', borderLeftColor: activeId === c.id ? 'var(--colour-standard-pass)' : 'transparent', color: '#0A0A0A' }}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-sm font-medium truncate" style={{ color: '#0A0A0A' }}>{c.title || 'New session'}</div>
+                    <div className="text-[11px] whitespace-nowrap" style={{ color: '#6B7280' }}>{formatWhen(getLastTimestamp(c))}</div>
+                  </div>
+                  <div className="text-xs mt-1 truncate" style={{ color: '#374151' }}>
+                    {ellipsize(stripMarkdown(formatPreview(c)))}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="pt-2 p-4">
+              <div style={{ height: 1, background: '#ECECEC', margin: '8px 0 12px 0' }} />
+              <UserMenuDropup />
+            </div>
+          </>
+        ) : (
+          <div className="mt-auto p-2 flex items-end justify-center">
+            <UserMenuDropup compact />
+          </div>
+        )}
       </div>
 
       {/* Mobile drawer */}
       <MobileDrawerLeft open={open} onClose={onClose}>
         <div className="flex items-center justify-between mb-4">
-          <div className="text-lg font-medium text-white trajan-text">Sessions</div>
+          <img src={new URL('../../assets/nirvana_bird.png', import.meta.url).toString()} alt="Nirvana" width={24} height={24} className="block" />
           <button 
             type="button" 
             onClick={onCreate} 
-            className="px-3 py-1 rounded-lg bg-[#c19658] hover:bg-[#d1a668] text-sm text-black font-medium transition-colors" 
+            className="px-3 py-1 rounded-lg text-sm font-medium transition-colors" 
+            style={{ background: 'var(--colour-standard-pass)', color: '#000' }}
             aria-label="New session"
           >
             New
@@ -306,23 +370,21 @@ export const TalksSidebar: React.FC<Props> = ({ chats, activeId, onSelect, onCre
                 onSelect(c.id);
                 if (onClose) onClose();
               }}
-              className={`w-full text-left p-3 rounded-lg mb-2 transition-all duration-200 ${
-                activeId === c.id 
-                  ? 'bg-white/15 border-l-4 border-[#c19658]' 
-                  : 'hover:bg-white/10 border-l-4 border-transparent'
-              } text-gray-200`}
+              className={`w-full text-left p-3 rounded-lg mb-2 transition-all duration-200 border-l-4`}
+              style={{ background: activeId === c.id ? 'var(--colour-surface)' : 'transparent', borderLeftColor: activeId === c.id ? 'var(--colour-standard-pass)' : 'transparent', color: 'var(--colour-text-primary)' }}
             >
               <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-medium truncate">{c.title || 'New session'}</div>
-                <div className="text-[11px] text-gray-400 whitespace-nowrap">{formatWhen(getLastTimestamp(c))}</div>
+                <div className="text-sm font-medium truncate" style={{ color: 'var(--colour-text-primary)' }}>{c.title || 'New session'}</div>
+                <div className="text-[11px] whitespace-nowrap" style={{ color: 'var(--colour-text-muted)' }}>{formatWhen(getLastTimestamp(c))}</div>
               </div>
-              <div className="text-xs text-gray-400 mt-1 truncate">
+              <div className="text-xs mt-1 truncate" style={{ color: 'var(--colour-text-secondary)' }}>
                 {ellipsize(stripMarkdown(formatPreview(c)))}
               </div>
             </button>
           ))}
         </div>
-        <div className="pt-2 border-t border-white/10">
+        <div className="pt-2">
+          <div style={{ height: 1, background: '#ECECEC', margin: '8px 0 12px 0' }} />
           <UserMenuDropup onAction={onClose} />
         </div>
       </MobileDrawerLeft>

@@ -12,6 +12,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import RequestResetPage from './pages/RequestResetPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import { ComplianceProvider } from './context/ComplianceContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AccountPage from './pages/AccountPage';
 import { setCookie } from './services/http';
@@ -114,7 +115,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ComplianceProvider>
-      <RouterProvider router={router} />
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </ComplianceProvider>
   </React.StrictMode>
 );
