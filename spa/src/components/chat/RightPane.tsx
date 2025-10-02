@@ -86,6 +86,7 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
   const [showReturns, setShowReturns] = useState(false);
   const [tooltipProduct, setTooltipProduct] = useState<{symbol: string; name: string; x: number; y: number} | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showTip, setShowTip] = useState(false);
   const { user } = useAuth();
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [ccText, setCcText] = useState('');
@@ -268,6 +269,30 @@ const RightPane: React.FC<Props> = ({ showRight, loadingSummary, summary, select
 
       {!summary && !loadingRecs && matches.length === 0 && (
         <div>
+          <div className="flex gap-2 items-start mb-4">
+            <p className="!text-2xl trajan-text trajan-text nv-text-primary">Proximity</p>
+            <p className="text-md trajan-text relative right-1 bottom-1 nv-text-primary">Search</p>
+            <div className="relative right-2 bottom-2 mb-0 ml-0">
+              <button
+                type="button"
+                aria-label="What's this?"
+                onMouseEnter={() => setShowTip(true)}
+                onMouseLeave={() => setShowTip(false)}
+                onFocus={() => setShowTip(true)}
+                onBlur={() => setShowTip(false)}
+                onClick={() => setShowTip((v) => !v)}
+                className="w-3 h-3 inline-flex items-center justify-center rounded-full text-[8px]"
+                style={{ border: '1px solid var(--colour-glass-border)', color: 'var(--colour-text-primary)' }}
+              >
+                i
+              </button>
+              {showTip && (
+                <div className="text-[12px] absolute top-full left-1/2 -translate-x-1/2 mt-2 z-10 rounded-md p-2 w-fit whitespace-nowrap" style={{ color: 'var(--colour-text-primary)', background: 'var(--colour-surface)', border: '1px solid var(--colour-glass-border)', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+                  Nirvana's search engine
+                </div>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-2 text-[11px] uppercase tracking-wider mb-3" style={{ color: 'var(--colour-text-muted)' }}>
             <div>
               <div>Search results</div>
